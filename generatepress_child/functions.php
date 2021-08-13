@@ -146,6 +146,42 @@ function colorthief_scripts() {
 add_action( 'wp_enqueue_scripts', 'colorthief_scripts' );
 /*---------------/color thief--------------- */
 
+/*---------------logo shortcode--------------- */
+function huenique_logo_shortcode() {
+    return '<style>
+    .rainbow-text {
+        font-family: Arial;
+        font-weight: bold;
+        font-size: 50px;
+      background-color: #212121;
+    
+    }
+    .rainbow-text .block-line > span {
+        display: inline-block;
+    }
+    .block-line {
+        background-image: linear-gradient(145deg,red,red,orange,yellow,#BFFF00,cyan,#6753FF,#5E00FF,purple);
+        color: #0000;
+        -webkit-background-clip: text;
+        background-clip: text;
+    }
+    .normal-text {
+        text-align: bold;
+    font-weight: normal;
+    font-size: 44px;
+    color: #eeebf0;
+    }
+    
+    </style>
+    <div class="rainbow-text" style="text-align: center;">
+        <span class="block-line">HUE</span><span class="normal-text">nique</span>
+    </div>
+    <br>';
+
+}
+add_shortcode( 'huenique_logo', 'huenique_logo_shortcode' );
+/*---------------/logo shortcode--------------- */
+
 
 add_action( 'wp_enqueue_scripts', function() {
     wp_dequeue_style( 'generate-child' );
