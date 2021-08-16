@@ -23,7 +23,7 @@ function generatepress_child_customizer_css() {
 
 	$css = '';
 
-	$color1 = get_theme_mod( 'custom_color1', '#c96e40' );
+	$color1 = get_theme_mod( 'custom_color1', '#dddddd' ); //TODO, make default normal
     $color2 = get_theme_mod( 'custom_color2', '#4fe3d9' );
     //hardcoded for demo
 	$css .= ' .main-navigation { background-color: ' . $color1 . '; }';
@@ -49,6 +49,17 @@ function huenique_custom_palettes($palettes) {
     );
     return $palettes;
 }
+
+function mytheme_customizer_live_preview() {
+    wp_enqueue_script( 
+        'mytheme-themecustomizer',			//Give the script an ID
+        get_template_directory_uri().'/js/theme-customizer.js',//Point to file
+        array( 'jquery','customize-preview' ),	//Define dependencies
+        '',						//Define a version (optional) 
+        true						//Put script in footer?
+    );
+}
+add_action( 'customize_preview_init', 'mytheme_customizer_live_preview' );
 /*---------------/Do things with customizer--------------- */
 
 //when image is loaded,
@@ -130,23 +141,6 @@ function colorthief_shortcode($atts, $content=null) {
 }
 add_shortcode( 'colorthief', 'colorthief_shortcode' );
 
-function colorthief_scripts() {
-    wp_register_script( 'color_thief', 
-                       plugins_url( '/js/color-thief.min.js', __FILE__ ),
-                       array(),
-                       'scriptversion 1.5.8', 
-                       true);
-  
-//enque scripts
-    wp_enqueue_script('color_thief', get_template_directory_uri() .'/js/color-thief.min.js', array('jquery'), null, true);
-
- 
- 
-}
-add_action( 'wp_enqueue_scripts', 'colorthief_scripts' );
-/*---------------/color thief--------------- */
-
-/*---------------logo shortcode--------------- */
 function huenique_logo_shortcode() {
     return '<style>
     .rainbow-text {
@@ -180,16 +174,33 @@ function huenique_logo_shortcode() {
 
 }
 add_shortcode( 'huenique_logo', 'huenique_logo_shortcode' );
-/*---------------/logo shortcode--------------- */
+
+function colorthief_scripts() {
+    wp_register_script( 'color_thief', 
+                       plugins_url( '/js/color-thief.min.js', __FILE__ ),
+                       array(),
+                       'scriptversion 1.5.8', 
+                       true);
+  
+//enque scripts
+    wp_enqueue_script('color_thief', get_template_directory_uri() .'/js/color-thief.min.js', array('jquery'), null, true);
+
+ 
+ 
+}
+add_action( 'wp_enqueue_scripts', 'colorthief_scripts' );
+/*---------------/color thief--------------- */
 
 
 add_action( 'wp_enqueue_scripts', function() {
     wp_dequeue_style( 'generate-child' );
     wp_enqueue_style( 'generate-child' );
     wp_add_inline_style( 'generate-child', generatepress_child_customizer_css() );
-}, 999 );
 
+}, 999 );
 add_filter( 'generate_default_color_palettes', 'huenique_custom_palettes' );
+
+
 
 
 

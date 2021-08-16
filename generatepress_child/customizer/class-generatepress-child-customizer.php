@@ -23,6 +23,7 @@ class Generatepress_Child_Customizer {
         $wp_customize->add_setting( 'logo', array(
             /*'default'           => '#444444',
             'sanitize_callback' => 'sanitize_hex_color'*/
+            'transport'   => 'postMessage',
         ) );
         $wp_customize->add_setting( 'custom_color1', array(
             /*'default'           => '#60ff21',*/
@@ -32,14 +33,23 @@ class Generatepress_Child_Customizer {
             /*'default'           => '#ff2197',*/
             'sanitize_callback' => 'sanitize_hex_color'
         ) );
+        $wp_customize->add_setting( 'custom_color1a', array(
+            /*'default'           => '#60ff21',*/
+            'sanitize_callback' => 'sanitize_hex_color'
+        ) );
+        $wp_customize->add_setting( 'custom_color2a', array(
+            /*'default'           => '#ff2197',*/
+            'sanitize_callback' => 'sanitize_hex_color'
+        ) );
 
-        //TODO give the people some instructions
+        //TODO postMessage would be faster
         $wp_customize->add_control(
             new WP_Customize_Image_Control(
                 $wp_customize,
                 'logo',
                 array(
                     'label'      => __( 'Upload your logo', 'generatepress_child' ),
+                    'description' => __( 'The main colors from your logo will be extracted and used to set your theme colors. <br><br> The colors below will be automatically generated when you upload an image, then you can further modify them or specific elements as desired' ),
                     'section'    => 'logo_colors',
                     'settings'   => 'logo',
                     'priority' => 9
@@ -51,19 +61,36 @@ class Generatepress_Child_Customizer {
             'label'    => esc_html__( 'Color 1', 'generatepress_child' ),
             'section'  => 'logo_colors',
             'settings' => 'custom_color1',
+            'description' => __( 'Your main theme color. This will be applied to the header, footer, and other major elements.' ),
             'priority' => 10
         ) ) );
         $wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'color2', array(
             'label'    => esc_html__( 'Color 2', 'generatepress_child' ),
             'section'  => 'logo_colors',
             'settings' => 'custom_color2',
+            'description' => __( 'Your secondary theme color. This will be applied to buttons, accents, and other elements.' ),
+
+            'priority' => 12
+        ) ) );
+        $wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'color1a', array(
+            'label'    => esc_html__( 'Color 1 Alternate', 'generatepress_child' ),
+            'section'  => 'logo_colors',
+            'settings' => 'custom_color1a',
+            'description' => __( 'Alternate or hover color for elements that are color 1. This will be used occasionally.' ),
             'priority' => 11
+        ) ) );
+        $wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'color2a', array(
+            'label'    => esc_html__( 'Color 2 Alternate', 'generatepress_child' ),
+            'section'  => 'logo_colors',
+            'settings' => 'custom_color2a',
+            'description' => __( 'Alternate or hover color for elements that are color 1. This will be used occasionally.' ),
+            'priority' => 13
         ) ) );
        
         
-        
-        
     }
+
+    
 
     /* Sanatizing is good and should be done? TODO sanitize image
     public function sanitize_checkbox( $input ) {
