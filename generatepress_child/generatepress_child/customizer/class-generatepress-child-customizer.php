@@ -21,7 +21,9 @@ class Generatepress_Child_Customizer {
     }
 
     public function my_preview_js() {
-        wp_enqueue_script( 'custom_css_preview', get_stylesheet_directory_uri().'/js/theme-customizer.js', array( 'customize-preview', 'jquery' ), date("h:i:s") );         
+        wp_enqueue_script( 'custom_css_preview', get_template_directory_uri().'/js/theme-customizer.js', array( 'customize-preview', 'jquery' ) );
+        $yeehaw = "yeehaw";  
+                ?><pre><?php var_dump($yeehaw); ?></pre><?php   
     }
 
     private function logo_colors_section( $wp_customize ) {

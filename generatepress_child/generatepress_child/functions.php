@@ -1,5 +1,5 @@
 <?php
-/*// Exit if accessed directly
+// Exit if accessed directly
 if ( !defined( 'ABSPATH' ) ) exit;
 
 // BEGIN ENQUEUE PARENT ACTION
@@ -21,7 +21,7 @@ function remove_admin_bar() {
 if (!current_user_can('administrator') && !is_admin()) {
        show_admin_bar(false);
        }
-  } */
+  } 
 /**
  * GeneratePress child theme functions and definitions.
  *
@@ -33,11 +33,10 @@ if (!current_user_can('administrator') && !is_admin()) {
  * Include Customizer settings.
  */
 
+//TODO not hardcoded
+require 'C:\wamp64\www\kendratestsite\wp-content\themes\generatepress_child\customizer\class-generatepress-child-customizer.php';
 
-require(get_stylesheet_directory() . '/customizer/class-generatepress-child-customizer.php');
 add_action( 'wp_enqueue_scripts', function () { wp_enqueue_script( 'jquery' ); } );
-
-add_action( 'wp_enqueue_scripts', 'colorthief_scripts' );
 
 //make customizer menu
 new Generatepress_Child_Customizer();
@@ -201,11 +200,12 @@ function colorthief_scripts() {
                        true);
   
 //enque scripts
-    wp_enqueue_script('color_thief', get_stylesheet_directory_uri() .'/js/color-thief.min.js', array('jquery'), null, true);
+    wp_enqueue_script('color_thief', get_template_directory_uri() .'/js/color-thief.min.js', array('jquery'), null, true);
 
  
  
 }
+add_action( 'wp_enqueue_scripts', 'colorthief_scripts' );
 /*---------------/color thief--------------- */
 
 
