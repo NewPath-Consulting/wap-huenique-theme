@@ -6,6 +6,7 @@ class Generatepress_Child_Customizer {
 	
 	public function __construct() {
         add_action( 'customize_register', array( $this, 'register_customize_sections' ) );
+        add_action( 'customize_preview_init', array( $this, 'my_preview_js') );
     }
     //add all sections and panels to the Customizer
     public function register_customize_sections( $wp_customize ) {    
@@ -19,11 +20,16 @@ class Generatepress_Child_Customizer {
 
     }
 
+    public function my_preview_js() {
+        wp_enqueue_script( 'custom_css_preview', get_template_directory_uri().'/js/theme-customizer.js', array( 'customize-preview', 'jquery' ) );
+        $yeehaw = "yeehaw";  
+                ?><pre><?php var_dump($yeehaw); ?></pre><?php   
+    }
+
     private function logo_colors_section( $wp_customize ) {
         $wp_customize->add_setting( 'logo', array(
             /*'default'           => '#444444',
             'sanitize_callback' => 'sanitize_hex_color'*/
-            'transport'   => 'postMessage',
         ) );
         $wp_customize->add_setting( 'custom_color1', array(
             /*'default'           => '#60ff21',*/
@@ -42,6 +48,7 @@ class Generatepress_Child_Customizer {
             'sanitize_callback' => 'sanitize_hex_color'
         ) );
 
+        $wp_customize->get_setting( 'logo' )->transport = 'postMessage';
         //TODO postMessage would be faster
         $wp_customize->add_control(
             new WP_Customize_Image_Control(

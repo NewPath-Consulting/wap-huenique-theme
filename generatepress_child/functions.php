@@ -1,4 +1,27 @@
 <?php
+// Exit if accessed directly
+if ( !defined( 'ABSPATH' ) ) exit;
+
+// BEGIN ENQUEUE PARENT ACTION
+// AUTO GENERATED - Do not modify or remove comment markers above or below:
+
+if ( !function_exists( 'chld_thm_cfg_locale_css' ) ):
+    function chld_thm_cfg_locale_css( $uri ){
+        if ( empty( $uri ) && is_rtl() && file_exists( get_template_directory() . '/rtl.css' ) )
+            $uri = get_template_directory_uri() . '/rtl.css';
+        return $uri;
+    }
+endif;
+add_filter( 'locale_stylesheet_uri', 'chld_thm_cfg_locale_css' );
+
+// END ENQUEUE PARENT ACTION
+//Hide admin bar for all users except administrators
+add_action('after_setup_theme', 'remove_admin_bar');
+function remove_admin_bar() {
+if (!current_user_can('administrator') && !is_admin()) {
+       show_admin_bar(false);
+       }
+  } 
 /**
  * GeneratePress child theme functions and definitions.
  *
@@ -13,8 +36,11 @@
 //TODO not hardcoded
 require 'C:\wamp64\www\kendratestsite\wp-content\themes\generatepress_child\customizer\class-generatepress-child-customizer.php';
 
+add_action( 'wp_enqueue_scripts', function () { wp_enqueue_script( 'jquery' ); } );
+
 //make customizer menu
 new Generatepress_Child_Customizer();
+
 
 
 /*---------------Do things with customizer--------------- */
@@ -50,16 +76,7 @@ function huenique_custom_palettes($palettes) {
     return $palettes;
 }
 
-function mytheme_customizer_live_preview() {
-    wp_enqueue_script( 
-        'mytheme-themecustomizer',			//Give the script an ID
-        get_template_directory_uri().'/js/theme-customizer.js',//Point to file
-        array( 'jquery','customize-preview' ),	//Define dependencies
-        '',						//Define a version (optional) 
-        true						//Put script in footer?
-    );
-}
-add_action( 'customize_preview_init', 'mytheme_customizer_live_preview' );
+
 /*---------------/Do things with customizer--------------- */
 
 //when image is loaded,
