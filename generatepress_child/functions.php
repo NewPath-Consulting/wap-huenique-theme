@@ -37,6 +37,21 @@ if (!current_user_can('administrator') && !is_admin()) {
 require(get_stylesheet_directory() . '/customizer/class-generatepress-child-customizer.php');
 add_action( 'wp_enqueue_scripts', function () { wp_enqueue_script( 'jquery' ); } );
 
+function colorthief_scripts() {
+    wp_register_script( 'color_thief', 
+    get_stylesheet_directory_uri() . '/js/color-thief.min.js',
+                       array(),
+                       'scriptversion 1.5.8.1', 
+                       true);
+  
+//enque scripts
+    wp_enqueue_script('color_thief');
+
+ 
+ 
+}
+
+
 add_action( 'wp_enqueue_scripts', 'colorthief_scripts' );
 
 //make customizer menu
@@ -193,19 +208,7 @@ function huenique_logo_shortcode() {
 }
 add_shortcode( 'huenique_logo', 'huenique_logo_shortcode' );
 
-function colorthief_scripts() {
-    wp_register_script( 'color_thief', 
-                       plugins_url( '/js/color-thief.min.js', __FILE__ ),
-                       array(),
-                       'scriptversion 1.5.8', 
-                       true);
-  
-//enque scripts
-    wp_enqueue_script('color_thief', get_stylesheet_directory_uri() .'/js/color-thief.min.js', array('jquery'), null, true);
 
- 
- 
-}
 /*---------------/color thief--------------- */
 
 

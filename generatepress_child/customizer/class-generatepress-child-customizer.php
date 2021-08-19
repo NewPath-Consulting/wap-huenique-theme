@@ -21,6 +21,8 @@ class Generatepress_Child_Customizer {
     }
 
     public function my_preview_js() {
+        //require(get_stylesheet_directory().'/js/color-thief.min.js');
+
         wp_enqueue_script( 'custom_css_preview', get_stylesheet_directory_uri().'/js/theme-customizer.js', array( 'customize-preview', 'jquery' ), date("h:i:s") );         
     }
 
@@ -46,7 +48,6 @@ class Generatepress_Child_Customizer {
             'sanitize_callback' => 'sanitize_hex_color'
         ) );
 
-        $wp_customize->get_setting( 'logo' )->transport = 'postMessage';
         //TODO postMessage would be faster
         $wp_customize->add_control(
             new WP_Customize_Image_Control(
@@ -62,6 +63,8 @@ class Generatepress_Child_Customizer {
                 )
             )
         );
+        $wp_customize->get_setting( 'logo' )->transport = 'postMessage';
+
         $wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'color1', array(
             'label'    => esc_html__( 'Color 1', 'generatepress_child' ),
             'section'  => 'logo_colors',
