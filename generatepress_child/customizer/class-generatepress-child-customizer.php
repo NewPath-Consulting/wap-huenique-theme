@@ -6,7 +6,9 @@ class Generatepress_Child_Customizer {
 	
 	public function __construct() {
         add_action( 'customize_register', array( $this, 'register_customize_sections' ) );
-        add_action( 'customize_preview_init', array( $this, 'my_preview_js') );
+        //https://wordpress.stackexchange.com/questions/138630/customizer-when-to-use-customize-preview-init-vs-customize-controls-enqueue-scr
+        //add_action( 'customize_preview_init', array( $this, 'my_preview_js') );
+        add_action( 'customize_controls_enqueue_scripts', array( $this, 'my_link_js') );
     }
     //add all sections and panels to the Customizer
     public function register_customize_sections( $wp_customize ) {    
@@ -26,8 +28,14 @@ class Generatepress_Child_Customizer {
         wp_enqueue_script( 'custom_css_preview', get_stylesheet_directory_uri().'/js/theme-customizer.js', array( 'customize-preview', 'jquery' ), date("h:i:s") );         
     }
 
+    public function my_link_js() {
+        wp_enqueue_script( 'custom_link_preview', get_stylesheet_directory_uri().'/js/link_test.js', array( 'customize-preview', 'jquery' ), date("h:i:s") );         
+
+    }
+    //TODO?: don't show up until logo processed
+    //https://make.xwp.co/2016/07/24/dependently-contextual-customizer-controls/
     private function logo_colors_section( $wp_customize ) {
-        $wp_customize->add_setting( 'logo', array(
+        $wp_customize->add_setting( 'logo1', array(
             /*'default'           => '#444444',
             'sanitize_callback' => 'sanitize_hex_color'*/
         ) );
@@ -52,18 +60,19 @@ class Generatepress_Child_Customizer {
         $wp_customize->add_control(
             new WP_Customize_Image_Control(
                 $wp_customize,
-                'logo',
+                'logo1',
                 array(
                     'label'      => __( 'Upload your logo', 'generatepress_child' ),
                     'description' => __( 'The main colors from your logo will be extracted and used to set your theme colors. <br><br> The colors below will be automatically generated when you upload an image, then you can further modify them or specific elements as desired' ),
                     'section'    => 'logo_colors',
-                    'settings'   => 'logo',
-                    'priority' => 9
+                    'settings'   => 'logo1',
+                    'priority' => 9,
+                    //'transport' => 'refresh',
                     //'context'    => 'your_setting_context'
                 )
             )
         );
-        $wp_customize->get_setting( 'logo' )->transport = 'postMessage';
+        //$wp_customize->get_setting( 'logo' )->transport = 'postMessage';
 
         $wp_customize->add_control( new WP_Customize_Color_Control( $wp_customize, 'color1', array(
             'label'    => esc_html__( 'Color 1', 'generatepress_child' ),

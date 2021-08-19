@@ -33,6 +33,7 @@ if (!current_user_can('administrator') && !is_admin()) {
  * Include Customizer settings.
  */
 
+ //https://developer.wordpress.org/reference/hooks/customize_controls_enqueue_scripts/
 
 require(get_stylesheet_directory() . '/customizer/class-generatepress-child-customizer.php');
 add_action( 'wp_enqueue_scripts', function () { wp_enqueue_script( 'jquery' ); } );
