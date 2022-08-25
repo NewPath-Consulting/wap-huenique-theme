@@ -1,5 +1,6 @@
 (function($) {
 
+    // keys corresponding to the color picker controls
     let color_picker_keys = [
         'custom_color1', 
         'custom_color2', 
@@ -7,14 +8,20 @@
         'custom_color2a'
     ];
 
-    wp.customize('logo', function(value) {
+    let default_value = '#fff';
+
+    // runs when logo upload is updated
+    wp.customize('logo', (value) => {
         value.bind(function(to) {
             fetch(to)
                 .then(resp => resp.blob())
                 .then(blobobject => {
-                    console.log(blobobject);
-                    // if blob is not an image ignore it
-                    if (blobobject.type != 'image/png') return;
+                    // if blob is not an image, ignore it
+                    if (blobobject.type != 'image/png') {
+                        reset_color_pickers();
+                        return;
+                    }
+
                     var img = new Image();
                     img.src = to;
 
@@ -51,10 +58,13 @@
         })
     })
 
-    function get_image_palette(img) {
-        let color_thief = new ColorThief();
-        var palette = color_thief.getPalette(img, 4);
-        var palette_hex = palette.map((rgb) => rgbToHex(rgb));
+    function reset_color_pickers() {
+        // set color picker controls to palette hex values
+        color_picker_keys.forEach((key) => {
+            parent.wp.customize(key, 
+                field => field.set(default_value)
+            )
+        });
     }
 
     const rgbToHex = (r, g, b) => '#' + [r, g, b].map(x => {
