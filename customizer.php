@@ -10,9 +10,15 @@ class Generatepress_Child_Customizer {
         add_action('customize_preview_init', array($this, 'customize_preview_js'));
         add_action('customize_controls_enqueue_scripts', array($this, 'customize_control_js'));
 
-        // add_action( 'customize_preview_init', array( $this, 'my_preview_js') );
-        // add_action( 'customize_controls_enqueue_scripts', array( $this, 'my_preview_js') );
-        // add_action( 'customize_controls_enqueue_scripts', array( $this, 'my_link_js') );
+
+        wp_enqueue_script(
+            'color_thief',
+            get_stylesheet_directory_uri() . '/js/color-thief.min.js',
+            array(),
+            date("h:i:s"),
+            true
+        );
+
     }
     //add all sections and panels to the Customizer
     public function register_customize_sections( $wp_customize ) {    
@@ -46,16 +52,6 @@ class Generatepress_Child_Customizer {
         );
     }
 
-    public function my_preview_js() {
-        //require(get_stylesheet_directory().'/js/color-thief.min.js');
-
-        wp_enqueue_script( 'custom_css_preview', get_stylesheet_directory_uri().'/js/theme-customizer.js', array( 'customize-preview', 'jquery' ), date("h:i:s") );         
-    }
-
-    public function my_link_js() {
-        wp_enqueue_script( 'custom_link_preview', get_stylesheet_directory_uri().'/js/link_test.js', array( 'customize-preview', 'jquery' ), date("h:i:s") );         
-
-    }
     //TODO?: don't show up until logo processed
     //https://make.xwp.co/2016/07/24/dependently-contextual-customizer-controls/
     private function logo_colors_section( $wp_customize ) {
