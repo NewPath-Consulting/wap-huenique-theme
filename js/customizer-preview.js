@@ -28,9 +28,11 @@
                             rgbToHex(rgb[0], rgb[1], rgb[2]) 
                         );
 
-                        // set color picker fields to hex values
+                        // set color picker controls to palette hex values
                         color_picker_keys.forEach((key, idx) => {
-                            wp.customize(key, field => field.set(palette_hex[idx]))
+                            parent.wp.customize(key, 
+                                field => field.set(palette_hex[idx])
+                            )
                         });
 
                     }
