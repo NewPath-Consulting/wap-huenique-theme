@@ -49,12 +49,6 @@
                     console.log('There was an error downloading the image.')
                 )
 
-
-
-            // don't do anything if image doesn't exist
-            // if (!$('img.attachment-thumb').length) return;
-            
-
         })
     })
 
