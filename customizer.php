@@ -119,7 +119,6 @@ class Generatepress_Child_Customizer {
                 )
             )
         );
-        //$wp_customize->get_setting( 'logo' )->transport = 'postMessage';
 
         $wp_customize->add_control( new WP_Customize_Color_Control( 
             $wp_customize, 

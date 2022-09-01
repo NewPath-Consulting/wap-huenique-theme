@@ -17,7 +17,7 @@
                 .then(resp => resp.blob())
                 .then(blobobject => {
                     // if blob is not an image, ignore it
-                    if (blobobject.type != 'image/png') {
+                    if (!blobobject.type.includes('image')) {
                         reset_color_pickers();
                         return;
                     }
