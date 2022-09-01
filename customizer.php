@@ -3,23 +3,32 @@
 //nosegraze tutorial https://www.nosegraze.com/customizer-settings-wordpress-theme/
 
 class Generatepress_Child_Customizer {
+
+    private $custom_color_control_keys = array(
+        'custom_color1' => array(
+            'title' => 'Color 1',
+            'description' => 'Your main theme color. This will be applied to the header, footer, and other major elements.'
+        ),
+        'custom_color2' => array(
+            'title' => 'Color 1',
+            'description' => 'Your secondary theme color. This will be applied to buttons, accents, and other elements.'
+        ),
+        'custom_color1a' => array(
+            'title' => 'Color 1 Alternate',
+            'description' => 'Alternate or hover color for elements that are color 1. This will be used occasionally.'
+        ),
+        'custom_color2a' => array(
+            'title' => 'Color 2 Alternate',
+            'description' => 'Alternate or hover color for elements that are color 1. This will be used occasionally.'
+        )
+    );
 	
 	public function __construct() {
         // add customizer controls
         add_action( 'customize_register', array( $this, 'register_customize_sections' ) );
 
         // enqueue customizer scripts
-        add_action('customize_preview_init', array($this, 'customize_preview_js'));
         add_action('customize_controls_enqueue_scripts', array($this, 'customize_control_js'));
-
-        // enqueue colorthief library
-        wp_enqueue_script(
-            'color_thief',
-            get_stylesheet_directory_uri() . '/js/color-thief.min.js',
-            array(),
-            date("h:i:s"),
-            true
-        );
 
     }
     
@@ -68,6 +77,15 @@ class Generatepress_Child_Customizer {
             date("h:i:s"),
             true
         );
+
+        // enqueue colorthief library
+        wp_enqueue_script(
+            'color_thief',
+            get_stylesheet_directory_uri() . '/js/color-thief.min.js',
+            array(),
+            date("h:i:s"),
+            true
+        );
     }
 
     //TODO?: don't show up until logo processed
@@ -82,28 +100,7 @@ class Generatepress_Child_Customizer {
         $wp_customize->add_setting( 'logo', array(
             'transport' => 'postMessage'
         ) );
-        $wp_customize->add_setting( 'custom_color1', array(
-            /*'default'           => '#60ff21',*/
-            'sanitize_callback' => 'sanitize_hex_color',
-            'transport' => 'postMessage'
-        ) );
-        $wp_customize->add_setting( 'custom_color2', array(
-            /*'default'           => '#ff2197',*/
-            'sanitize_callback' => 'sanitize_hex_color',
-            'transport' => 'postMessage'
-        ) );
-        $wp_customize->add_setting( 'custom_color1a', array(
-            /*'default'           => '#60ff21',*/
-            'sanitize_callback' => 'sanitize_hex_color',
-            'transport' => 'postMessage'
-        ) );
-        $wp_customize->add_setting( 'custom_color2a', array(
-            /*'default'           => '#ff2197',*/
-            'sanitize_callback' => 'sanitize_hex_color',
-            'transport' => 'postMessage'
-        ) );
 
-        //TODO postMessage would be faster
         $wp_customize->add_control(
             new WP_Customize_Image_Control(
                 $wp_customize,
@@ -115,59 +112,34 @@ class Generatepress_Child_Customizer {
                     'settings'   => 'logo',
                     'priority' => 9,
                     'transport' => 'postMessage',
-                    //'context'    => 'your_setting_context'
                 )
             )
         );
 
-        $wp_customize->add_control( new WP_Customize_Color_Control( 
-            $wp_customize, 
-            'color1', 
-            array(
-                'label'    => esc_html__( 'Color 1', 'generatepress_child' ),
-                'section'  => 'logo_colors',
-                'settings' => 'custom_color1',
-                'description' => __( 'Your main theme color. This will be applied to the header, footer, and other major elements.' ),
-                'priority' => 10
+        $this->render_color_picker_controls($wp_customize);
         
-            )
-        ) );
-        $wp_customize->add_control( new WP_Customize_Color_Control( 
-            $wp_customize, 
-            'color2', 
-            array(
-                'label'    => esc_html__( 'Color 2', 'generatepress_child' ),
-                'section'  => 'logo_colors',
-                'settings' => 'custom_color2',
-                'description' => __( 'Your secondary theme color. This will be applied to buttons, accents, and other elements.' ),
+    }
 
-                'priority' => 12
-            )
-        ) );
-        $wp_customize->add_control( new WP_Customize_Color_Control( 
-            $wp_customize, 
-            'color1a',
-            array(
-                'label'    => esc_html__( 'Color 1 Alternate', 'generatepress_child' ),
-                'section'  => 'logo_colors',
-                'settings' => 'custom_color1a',
-                'description' => __( 'Alternate or hover color for elements that are color 1. This will be used occasionally.' ),
-                'priority' => 11
-            ) 
-        ) );
-        $wp_customize->add_control( new WP_Customize_Color_Control( 
-            $wp_customize, 
-            'color2a', 
-            array(
-                'label'    => esc_html__( 'Color 2 Alternate', 'generatepress_child' ),
-                'section'  => 'logo_colors',
-                'settings' => 'custom_color2a',
-                'description' => __( 'Alternate or hover color for elements that are color 1. This will be used occasionally.' ),
-                'priority' => 13
-            ) 
-        ) );
-       
-        
+    private function render_color_picker_controls($wp_customize) {
+        foreach ($this->custom_color_control_keys as $key => $data) {
+            $wp_customize->add_setting($key, array(
+                'sanitize_callback' => 'sanitize_hex_color',
+                'transport' => 'postMessage'
+            ));
+
+            $wp_customize->add_control( new WP_Customize_Color_Control( 
+                $wp_customize, 
+                'color2a', 
+                array(
+                    'label'    => esc_html__( $data['title'], 'generatepress_child' ),
+                    'section'  => 'logo_colors',
+                    'settings' => $key,
+                    'description' => __( $data['description'] ),
+                    'priority' => 13
+                ) 
+            ) );
+
+        }
     }
 
     
