@@ -10,7 +10,7 @@ class Generatepress_Child_Customizer {
             'description' => 'Your main theme color. This will be applied to the header, footer, and other major elements.'
         ),
         'custom_color2' => array(
-            'title' => 'Color 1',
+            'title' => 'Color 2',
             'description' => 'Your secondary theme color. This will be applied to buttons, accents, and other elements.'
         ),
         'custom_color1a' => array(
@@ -22,13 +22,14 @@ class Generatepress_Child_Customizer {
             'description' => 'Alternate or hover color for elements that are color 1. This will be used occasionally.'
         )
     );
-	
+
 	public function __construct() {
         // add customizer controls
         add_action( 'customize_register', array( $this, 'register_customize_sections' ) );
 
         // enqueue customizer scripts
-        add_action('customize_controls_enqueue_scripts', array($this, 'customize_control_js'));
+        add_action('customize_controls_enqueue_scripts', array($this, 
+        'customize_preview_js'));
 
     }
     
@@ -62,22 +63,7 @@ class Generatepress_Child_Customizer {
             date("h:i:s"),
             true
         );
-    }
-
-    /**
-     * Enqueues customizer control script.
-     *
-     * @return void
-     */
-    public function customize_control_js() {
-        wp_enqueue_script(
-            'wap_customize_controls_js', 
-            get_stylesheet_directory_uri() . '/js/customizer-control.js', 
-            array('customize-controls', 'jquery'), 
-            date("h:i:s"),
-            true
-        );
-
+        
         // enqueue colorthief library
         wp_enqueue_script(
             'color_thief',
@@ -87,6 +73,8 @@ class Generatepress_Child_Customizer {
             true
         );
     }
+
+
 
     //TODO?: don't show up until logo processed
     //https://make.xwp.co/2016/07/24/dependently-contextual-customizer-controls/
@@ -129,13 +117,12 @@ class Generatepress_Child_Customizer {
 
             $wp_customize->add_control( new WP_Customize_Color_Control( 
                 $wp_customize, 
-                'color2a', 
+                $key, 
                 array(
                     'label'    => esc_html__( $data['title'], 'generatepress_child' ),
                     'section'  => 'logo_colors',
                     'settings' => $key,
                     'description' => __( $data['description'] ),
-                    'priority' => 13
                 ) 
             ) );
 
