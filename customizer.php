@@ -31,6 +31,10 @@ class Generatepress_Child_Customizer {
         add_action('customize_controls_enqueue_scripts', array($this, 
         'customize_preview_js'));
 
+        add_filter('generate_option_defaults', array($this, 'customize_global_colors'));
+        add_filter('option_generate_settings', array($this, 'customize_global_colors'));
+
+
     }
     
     /**
@@ -75,6 +79,32 @@ class Generatepress_Child_Customizer {
     }
 
 
+    public function customize_global_colors($settings) {
+        $color1 = get_option('custom_color1');
+        $color2 = get_option('custom_color2');
+        $color1a = get_option('custom_color1a');
+        $color2a = get_option('custom_color2a');
+
+        // if custom colors haven't been set yet, return unchanged settings
+        if (!$color1) return $settings;
+
+        // change first accent color
+        foreach ($settings['global_colors'] as &$global_color) {
+            if ($global_color['slug'] != 'accent') continue;
+
+            $global_color['color'] = $color1;
+        }
+
+        if (!is_null($settings['global_colors'])) {
+            $settings['global_colors'][] = array(
+                'name' => sprintf(__('Accent %s', 'generatepress'), '2'),
+                'slug' => 'accent-2',
+                'color' => $color2
+            );
+        }
+
+        return $settings;
+    }
 
     //TODO?: don't show up until logo processed
     //https://make.xwp.co/2016/07/24/dependently-contextual-customizer-controls/
@@ -86,7 +116,8 @@ class Generatepress_Child_Customizer {
      */
     private function logo_colors_section( $wp_customize ) {
         $wp_customize->add_setting( 'logo', array(
-            'transport' => 'postMessage'
+            'transport' => 'postMessage',
+            'type' => 'option'
         ) );
 
         $wp_customize->add_control(
@@ -95,7 +126,7 @@ class Generatepress_Child_Customizer {
                 'logo_control',
                 array(
                     'label'      => __( 'Upload your logo', 'generatepress_child' ),
-                    'description' => __( 'The main colors from your logo will be extracted and used to set your theme colors. <br><br> The colors below will be automatically generated when you upload an image, then you can further modify them or specific elements as desired' ),
+                    'description' => __( 'The main colors from your logo will be extracted and used to set your theme colors. <br><br> The colors below will be automatically generated when you upload an image, then you can further modify them or specific elements as desired.<br><br>For best results, make sure your logo has a transparent background (not solid white) and at least two colors.' ),
                     'section'    => 'logo_colors',
                     'settings'   => 'logo',
                     'priority' => 9,
@@ -108,10 +139,18 @@ class Generatepress_Child_Customizer {
         
     }
 
+    /**
+     * Loops through color picker control data and adds a customizer color
+     * control for each one.
+     *
+     * @param WP_Customize_Manager $wp_customize
+     * @return void
+     */
     private function render_color_picker_controls($wp_customize) {
         foreach ($this->custom_color_control_keys as $key => $data) {
             $wp_customize->add_setting($key, array(
                 'sanitize_callback' => 'sanitize_hex_color',
+                'type' => 'option',
                 'transport' => 'postMessage'
             ));
 
