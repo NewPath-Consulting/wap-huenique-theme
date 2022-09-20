@@ -8,7 +8,7 @@
         'custom_color2a'
     ];
 
-    let default_value = '#fff';
+    let default_value = '#ffffff';
 
     // runs when logo upload is updated
     wp.customize('logo', (value) => {
@@ -40,18 +40,16 @@
                             hexToHSL(hex)
                         );
 
-                        // find accent colors
-                        palette_hsl = find_accent_colors(palette_hsl);
+                        let accent1 = find_accent_color(palette_hsl[0]);
+                        let accent2 = find_accent_color(palette_hsl[1]);
 
-                        // convert hsl palette to hex
-                        palette_hex = palette_hsl.map((color) => hslToHex(color));
+                        accent1 = hslToHex(accent1);
+                        accent2 = hslToHex(accent2);
 
-                        // set color picker controls to palette hex values
-                        color_picker_keys.forEach((key, idx) => {
-                            parent.wp.customize(key, 
-                                field => field.set(palette_hex[idx])
-                            )
-                        });
+                        parent.wp.customize('custom_color1', field => field.set(palette_hex[0]));
+                        parent.wp.customize('custom_color2', field => field.set(palette_hex[1]));
+                        parent.wp.customize('custom_color1a', field => field.set(accent1));
+                        parent.wp.customize('custom_color2a', field => field.set(accent2));
 
                         // parent.wp.customize('custom_logo', field => field.set(to));
 
@@ -169,75 +167,35 @@
         return `#${f(0)}${f(8)}${f(4)}`;
     }
 
-
-    function find_accent_colors(palette) {
-        let primary = palette[0];
-        let secondary = palette[1];
-
-        palette.push(find_accent_color(primary));
-        palette.push(find_accent_color(secondary));
-
-        return palette;
-    }
-
     function find_accent_color(color) {
         let accent = color;
 
         // if color is saturated enough, adjust the accent hue
         if (color['s'] >= 40) {
+            // adjust hue
             accent['h'] += 10;
 
+            // lighten or darken based on base color
             if (color['l'] > 70) {
-                accent['l'] -= 10;
+                accent['l'] -= 15;
             } else if (color['l'] < 30) {
-                accent['l'] += 10;
+                accent['l'] += 15;
             }
 
-            return accent;
+        } else {
+            // lighten or darken
+            if (color['l'] > 50) {
+                accent['l'] -= 20;
+            } else {
+                accent['l'] += 20;
+            }
         }
 
-        // lighten or darken
-        if (color['l'] > 50) {
-            accent['l'] -= 10;
-        } else {
-            accent['l'] += 10
-        }
+        // mod if new h or l is greater than maximum
+        accent['h'] %= 360;
+        accent['l'] %= 100;
 
         return accent;
-    }
-
-    /**
-     * 
-     * @param {array} palette 
-     * @param {*} primary_accent 
-     */
-    function find_secondary_accent_color(palette, primary_accent) {
-        // find second most saturated color in the palette
-        // if colors are too far apart, just slightly adjust the primary accent by 
-        // hue and lightness
-
-        let secondary_accent = {'h': 0, 's': 0, 'l': 0};
-
-        palette.forEach((color) => {
-            if (color['s'] > secondary_accent['s'] && color != primary_accent) {
-                secondary_accent = color;
-            }
-        });
-
-        // adjust primary to get secondary if hues are too far apart
-        // if primary is light, make secondary dark
-        // if primary is dark, make secondary light
-
-        if (Math.abs(secondary_accent['h'] - primary_accent['h']) > 60) {
-            secondary_accent = {
-                'h': primary_accent['h'] + 10,
-                's': primary_accent['s'],
-                'l': primary_accent['l']
-            };
-        }
-
-        return secondary_accent;
-
     }
 
 }) (jQuery);

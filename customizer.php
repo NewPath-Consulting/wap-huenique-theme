@@ -86,7 +86,7 @@ class Generatepress_Child_Customizer {
         $color2a = get_option('custom_color2a');
 
         // if custom colors haven't been set yet, return unchanged settings
-        if (!$color1) return $settings;
+        if (!$color1 || $color1 == '#ffffff') return $settings;
 
         // change first accent color
         foreach ($settings['global_colors'] as &$global_color) {
@@ -100,6 +100,16 @@ class Generatepress_Child_Customizer {
                 'name' => sprintf(__('Accent %s', 'generatepress'), '2'),
                 'slug' => 'accent-2',
                 'color' => $color2
+            );
+            $settings['global_colors'][] = array(
+                'name' => sprintf(__('Accent %s', 'generatepress'), '3'),
+                'slug' => 'accent-3',
+                'color' => $color1a
+            );
+            $settings['global_colors'][] = array(
+                'name' => sprintf(__('Accent %s', 'generatepress'), '4'),
+                'slug' => 'accent-4',
+                'color' => $color2a
             );
         }
 
