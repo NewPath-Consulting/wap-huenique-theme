@@ -167,27 +167,36 @@
         return `#${f(0)}${f(8)}${f(4)}`;
     }
 
+    /**
+     * Finds an accent color based on `color`. Adjusts hue and luminosity of the
+     * original color to find a suitable accent color.
+     * 
+     * @param {array} color in HSL
+     * @returns {array} new accent color in HSL
+     */
     function find_accent_color(color) {
         let accent = color;
 
         // if color is saturated enough, adjust the accent hue
         if (color['s'] >= 40) {
             // adjust hue
-            accent['h'] += 10;
+            accent['h'] += 15;
 
             // lighten or darken based on base color
             if (color['l'] > 70) {
-                accent['l'] -= 15;
+                accent['l'] -= 20;
             } else if (color['l'] < 30) {
-                accent['l'] += 15;
+                accent['l'] += 20;
+            } else {
+                accent['l'] += 10;
             }
 
         } else {
             // lighten or darken
             if (color['l'] > 50) {
-                accent['l'] -= 20;
+                accent['l'] -= 25;
             } else {
-                accent['l'] += 20;
+                accent['l'] += 25;
             }
         }
 
