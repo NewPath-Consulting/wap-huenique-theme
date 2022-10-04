@@ -25,7 +25,7 @@ class Generatepress_Child_Customizer {
 
 	public function __construct() {
         // add customizer controls
-        add_action( 'customize_register', array( $this, 'register_customize_sections' ) );
+        add_action( 'customize_register', array( $this, 'register_customize_sections' ), 30 );
 
         // enqueue customizer scripts
         add_action('customize_controls_enqueue_scripts', array($this, 
@@ -211,6 +211,76 @@ class Generatepress_Child_Customizer {
 
         }
     }
+
+    /**
+     * Removes color controls added by GeneratePress.
+     *
+     * @param WP_Customize_Manager $wp_customize
+     * @return void
+     */
+    private function remove_generatepress_options( $wp_customize ) {
+        // body section
+        $wp_customize->remove_control( 'generate_body_colors_title' );
+        $wp_customize->remove_setting( 'generate_settings[background_color]' );
+        $wp_customize->remove_control( 'generate_settings[background_color]' );
+        $wp_customize->remove_setting( 'generate_settings[text_color]' );
+        $wp_customize->remove_control( 'generate_settings[text_color]' );
+        $wp_customize->remove_control( 'generate_body_link_wrapper' );
+        $wp_customize->remove_setting( 'generate_settings[link_color]' );
+        $wp_customize->remove_control( 'generate_settings[link_color]' );
+        $wp_customize->remove_setting( 'generate_settings[link_color_hover]' );
+        $wp_customize->remove_control( 'generate_settings[link_color_hover]' );
+        $wp_customize->remove_setting( 'generate_settings[link_color_visited]' );
+        $wp_customize->remove_control( 'generate_settings[link_color_visited]' );
+
+        // header section
+        $wp_customize->remove_control( 'generate_header_colors_title' );
+        $wp_customize->remove_setting( 'generate_settings[header_background_color]' );
+        $wp_customize->remove_control( 'generate_settings[header_background_color]' );
+        $wp_customize->remove_setting( 'generate_settings[header_text_color]' );
+        $wp_customize->remove_control( 'generate_settings[header_text_color]' );
+        $wp_customize->remove_control( 'generate_header_link_wrapper' );
+        $wp_customize->remove_setting( 'generate_settings[header_link_color]' );
+        $wp_customize->remove_control( 'generate_settings[header_link_color]' );
+        $wp_customize->remove_setting( 'generate_settings[header_link_hover_color]' );
+        $wp_customize->remove_control( 'generate_settings[header_link_hover_color]' );
+        $wp_customize->remove_setting( 'generate_settings[site_title_color]' );
+        $wp_customize->remove_control( 'generate_settings[site_title_color]' );
+        $wp_customize->remove_setting( 'generate_settings[site_tagline_color]' );
+        $wp_customize->remove_control( 'generate_settings[site_tagline_color]' );
+        
+        // buttons section
+        $wp_customize->remove_control( 'generate_buttons_colors_title' );
+        $wp_customize->remove_control( 'generate_buttons_background_wrapper' );
+        $wp_customize->remove_setting( 'generate_settings[form_button_background_color]' );
+        $wp_customize->remove_control( 'generate_settings[form_button_background_color]' );
+        $wp_customize->remove_setting( 'generate_settings[form_button_background_color_hover]' );
+        $wp_customize->remove_control( 'generate_settings[form_button_background_color_hover]' );
+        $wp_customize->remove_control( 'generate_buttons_text_wrapper' );
+        $wp_customize->remove_setting( 'generate_settings[form_button_text_color]' );
+        $wp_customize->remove_control( 'generate_settings[form_button_text_color]' );
+        $wp_customize->remove_setting( 'generate_settings[form_button_text_color_hover]' );
+        $wp_customize->remove_control( 'generate_settings[form_button_text_color_hover]' );
+
+        // forms section
+        $wp_customize->remove_control( 'generate_forms_colors_title' );
+        $wp_customize->remove_control( 'generate_forms_background_wrapper' );
+        $wp_customize->remove_setting( 'generate_settings[form_background_color]' );
+        $wp_customize->remove_control( 'generate_settings[form_background_color]' );
+        $wp_customize->remove_setting( 'generate_settings[form_background_color_focus]' );
+        $wp_customize->remove_control( 'generate_settings[form_background_color_focus]' );
+        $wp_customize->remove_control( 'generate_forms_text_wrapper' );
+        $wp_customize->remove_setting( 'generate_settings[form_text_color]' );
+        $wp_customize->remove_control( 'generate_settings[form_text_color]' );
+        $wp_customize->remove_setting( 'generate_settings[form_text_color_focus]' );
+        $wp_customize->remove_control( 'generate_settings[form_text_color_focus]' );
+        $wp_customize->remove_control( 'generate_forms_border_wrapper' );
+        $wp_customize->remove_setting( 'generate_settings[form_border_color]' );
+        $wp_customize->remove_control( 'generate_settings[form_border_color]' );
+        $wp_customize->remove_setting( 'generate_settings[form_border_color_focus]' );
+        $wp_customize->remove_control( 'generate_settings[form_border_color_focus]' );
+
+    }  
 
     
 
