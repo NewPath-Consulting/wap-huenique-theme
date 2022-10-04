@@ -88,29 +88,63 @@ class Generatepress_Child_Customizer {
         // if custom colors haven't been set yet, return unchanged settings
         if (!$color1 || $color1 == '#ffffff') return $settings;
 
-        // change first accent color
-        foreach ($settings['global_colors'] as &$global_color) {
-            if ($global_color['slug'] != 'accent') continue;
-
-            $global_color['color'] = $color1;
-        }
-
-        if (!is_null($settings['global_colors'])) {
-            $settings['global_colors'][] = array(
+        // add custom colors to array of global colors
+        $settings['global_colors'] = array(
+            array(
+                'name' => __( 'Contrast', 'generatepress' ),
+                'slug' => 'contrast',
+                'color' => '#222222',
+            ),
+            array(
+                /* translators: Contrast number */
+                'name' => sprintf( __( 'Contrast %s', 'generatepress' ), '2' ),
+                'slug' => 'contrast-2',
+                'color' => '#575760',
+            ),
+            array(
+                /* translators: Contrast number */
+                'name' => sprintf( __( 'Contrast %s', 'generatepress' ), '3' ),
+                'slug' => 'contrast-3',
+                'color' => '#b2b2be',
+            ),
+            array(
+                'name' => __( 'Base', 'generatepress' ),
+                'slug' => 'base',
+                'color' => '#f0f0f0',
+            ),
+            array(
+                /* translators: Base number */
+                'name' => sprintf( __( 'Base %s', 'generatepress' ), '2' ),
+                'slug' => 'base-2',
+                'color' => '#f7f8f9',
+            ),
+            array(
+                /* translators: Base number */
+                'name' => sprintf( __( 'Base %s', 'generatepress' ), '3' ),
+                'slug' => 'base-3',
+                'color' => '#ffffff',
+            ),
+            array(
+                'name' => __('Accent', 'generatepress'),
+                'slug' => 'accent',
+                'color' => $color1
+            ),
+            array(
                 'name' => sprintf(__('Accent %s', 'generatepress'), '2'),
                 'slug' => 'accent-2',
                 'color' => $color2
-            );
-            $settings['global_colors'][] = array(
+            ),
+            array(
                 'name' => sprintf(__('Accent %s', 'generatepress'), '3'),
                 'slug' => 'accent-3',
                 'color' => $color1a
-            );
-            $settings['global_colors'][] = array(
+            ),
+            array(
                 'name' => sprintf(__('Accent %s', 'generatepress'), '4'),
                 'slug' => 'accent-4',
                 'color' => $color2a
-            );
+            )
+        );
         }
 
         return $settings;
@@ -137,7 +171,7 @@ class Generatepress_Child_Customizer {
                 array(
                     'label'      => __( 'Upload your logo', 'generatepress_child' ),
                     'description' => __( 'The main colors from your logo will be extracted and used to set your theme colors. <br><br> The colors below will be automatically generated when you upload an image, then you can further modify them or specific elements as desired.<br><br>For best results, make sure your logo has a transparent background (not solid white) and at least two colors.' ),
-                    'section'    => 'logo_colors',
+                    'section'    => 'generate_colors_section',
                     'settings'   => 'logo',
                     'priority' => 9,
                     'transport' => 'postMessage',
