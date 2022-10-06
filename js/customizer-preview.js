@@ -8,6 +8,13 @@
         'custom_color2a'
     ];
 
+    let global_colors_accent_data = [
+        { name : 'Accent', slug : 'accent' },
+        { name : 'Accent 2', slug : 'accent-2' },
+        { name : 'Accent 3', slug : 'accent-3' },
+        { name : 'Accent 4', slug : 'accent-4' },
+    ];
+
     let default_value = '#ffffff';
 
     // runs when logo upload is updated
@@ -28,10 +35,10 @@
                     // wait for image to load, then get palette
                     img.onload = () => {
                         let color_thief = new ColorThief();
-                        let palette = color_thief.getPalette(img, 2);
+                        let image_palette = color_thief.getPalette(img, 2);
 
                         // convert rgb to hex
-                        let palette_hex = palette.map((rgb) =>
+                        let palette_hex = image_palette.map((rgb) =>
                             rgbToHex(rgb[0], rgb[1], rgb[2]) 
                         );
 
@@ -40,18 +47,47 @@
                             hexToHSL(hex)
                         );
 
-                        let accent1 = find_accent_color(palette_hsl[0]);
-                        let accent2 = find_accent_color(palette_hsl[1]);
+                        // find accent colors and convert to hex
+                        let accent3 = find_accent_color(palette_hsl[0]);
+                        let accent4 = find_accent_color(palette_hsl[1]);
 
-                        accent1 = hslToHex(accent1);
-                        accent2 = hslToHex(accent2);
+                        accent3 = hslToHex(accent3);
+                        accent4 = hslToHex(accent4);
 
-                        parent.wp.customize('custom_color1', field => field.set(palette_hex[0]));
-                        parent.wp.customize('custom_color2', field => field.set(palette_hex[1]));
-                        parent.wp.customize('custom_color1a', field => field.set(accent1));
-                        parent.wp.customize('custom_color2a', field => field.set(accent2));
+                        // construct custom accent color palette
+                        let palette = {
+                            'accent' : palette_hex[0],
+                            'accent-2' : palette_hex[1],
+                            'accent-3' : accent3,
+                            'accent-4' : accent4
+                        };
 
-                        // parent.wp.customize('custom_logo', field => field.set(to));
+                        // get current global colors
+                        let global_colors = parent.wp.customize.instance('generate_settings[global_colors]').get();
+
+                        // loop through the accent color data template
+                        global_colors_accent_data.forEach((global_color) => {
+                            // add color value to new global color object
+                            global_color.color = palette[global_color.slug];
+
+                            // look for accent color slug in saved global colors
+                            global_colors.find((color, i) => {
+
+                                // if accent value already exists, replace it
+                                if (color.slug === global_color.slug) {
+                                    global_colors[i].color = global_color.color;
+                                    return true;
+                                } 
+                            });
+
+                        });
+
+                        // send palette to rest route
+                        sendCustomPalette(global_colors_accent_data)
+                        .then((resp) => console.log(resp.json()))
+                        .catch(() => console.log('Error: could not connect to WordPress.'))                            
+
+                        parent.wp.customize('custom_logo', field => field.set(to));
 
                     }
 
@@ -73,6 +109,27 @@
                 field => field.set(default_value)
             )
         });
+    }
+
+    /**
+     * Sends custom color palette to WordPress REST API route.
+     * 
+     * @param {array} palette 
+     * @returns {Promise} 
+     */
+    const sendCustomPalette = async(palette) => {
+        const API_URL = '/wp-json/wawp-theme/v1/custompalette';
+
+        const resp = await fetch(API_URL, {
+            method : 'POST', 
+            headers : {
+                'Accept' : 'application/json',
+                'Content-Type' : 'application/json'
+            },
+            body : JSON.stringify(palette)
+        });
+
+        return resp;
     }
 
     /**
@@ -151,7 +208,7 @@
      * @param {int} h 
      * @param {int} s 
      * @param {int} l 
-     * @returns 
+     * @returns {string} hex color value
      */
     function hslToHex(hsl) {
         let h = hsl['h'];
