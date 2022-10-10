@@ -82,6 +82,8 @@
 
                         });
 
+                        updateGlobalColorControlCSS();
+
                         // send palette to rest route
                         sendCustomPalette(global_colors_accent_data)
                         .then((resp) => console.log(resp.json()))
@@ -130,6 +132,16 @@
         });
 
         return resp;
+    }
+
+    function updateGlobalColorControlCSS() {
+        console.log(global_colors_accent_data);
+        // change customizer palette colors
+        global_colors_accent_data.forEach((global_color) => {
+            let slug = global_color.slug;
+            let color_palette = $('[aria-label="' + slug + '"]');
+            color_palette.css({'color' : global_color.color});
+        })
     }
 
     /**
