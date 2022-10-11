@@ -23,8 +23,9 @@
             fetch(to)
                 .then(resp => resp.blob())
                 .then(blobobject => {
+                    let image = parent.wp.customize.instance('logo').get();
                     // if blob is not an image, ignore it
-                    if (!blobobject.type.includes('image')) {
+                    if (!blobobject.type.includes('image') || image.length == 0) {
                         reset_color_pickers();
                         return;
                     }
@@ -89,7 +90,11 @@
                         .then((resp) => console.log(resp.json()))
                         .catch(() => console.log('Error: could not connect to WordPress.'))                            
 
-                        parent.wp.customize('custom_logo', field => field.set(to));
+                        // set custom logo if flag is enabled
+                        let logo_upload_flag = parent.wp.customize.instance('logo_toggle').get();
+                        if (logo_upload_flag) {
+                            parent.wp.customize('custom_logo', field => field.set(to));
+                        }
 
                     }
 

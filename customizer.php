@@ -5,6 +5,7 @@
 class Generatepress_Child_Customizer {
 
     const CUSTOM_COLOR_PALETTE = 'wap_theme_custom_color_palette';
+    const LOGO_UPLOAD_FLAG = 'logo_toggle';
 
 	public function __construct() {
         // add customizer controls
@@ -111,7 +112,13 @@ class Generatepress_Child_Customizer {
         }
 
 
-        $settings['logo'] = $logo;
+        $logo_upload_flag = get_option(self::LOGO_UPLOAD_FLAG);
+
+        if ($logo_upload_flag) {
+            $settings['logo'] = $logo;
+        } else {
+            $settings['logo'] = '';
+        }
 
         return $settings;
     }
@@ -177,6 +184,18 @@ class Generatepress_Child_Customizer {
                 )
             )
         );
+
+        $wp_customize->add_setting( 'logo_toggle', array(
+            'transport' => 'postMessage',
+            'type' => 'option'
+        ) );
+
+        $wp_customize->add_control( 'logo_toggle', array(
+            'label'     => _( 'Add logo to website header' ),
+            'type'      => 'checkbox',
+            'section'   => 'generate_colors_section',
+            'priority'  => 9
+        ) );
 
     }
 
