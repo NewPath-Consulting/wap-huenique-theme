@@ -1,21 +1,11 @@
 (function($) {
 
-    // keys corresponding to the color picker controls
-    let color_picker_keys = [
-        'custom_color1', 
-        'custom_color2', 
-        'custom_color1a', 
-        'custom_color2a'
-    ];
-
     let global_colors_accent_data = [
         { name : 'Accent', slug : 'accent' },
         { name : 'Accent 2', slug : 'accent-2' },
         { name : 'Accent 3', slug : 'accent-3' },
         { name : 'Accent 4', slug : 'accent-4' },
     ];
-
-    let default_value = '#ffffff';
 
     // runs when logo upload is updated
     wp.customize('logo', (value) => {
@@ -80,15 +70,17 @@
                                     return true;
                                 } 
                             });
-
                         });
 
+                        // use css to change color of palettes before they are saved
                         updateGlobalColorControlCSS();
 
                         // send palette to rest route
                         sendCustomPalette(global_colors_accent_data)
                         .then((resp) => console.log(resp.json()))
-                        .catch(() => console.log('Error: could not connect to WordPress.'))                            
+                        .catch(() => console.log('Error: could not connect to WordPress.'))
+
+                        parent.wp.customize('generate_settings[global_colors]', field => field.set(global_colors))
 
                         // set custom logo if flag is enabled
                         let logo_upload_flag = parent.wp.customize.instance('logo_toggle').get();
@@ -107,15 +99,18 @@
     })
 
     /**
-     * Resets color picker controls to white (default color)
+     * Resets color picker controls by sending an empty palette to the WP REST
+     * API. 
      */
     function reset_color_pickers() {
-        // set color picker controls to palette hex values
-        color_picker_keys.forEach((key) => {
-            parent.wp.customize(key, 
-                field => field.set(default_value)
-            )
-        });
+
+        removeCustomColorPaletteCSS();
+
+        // send empty palette
+        sendCustomPalette(global_colors_accent_data)
+        .then((resp) => console.log(resp.json()))
+        .catch(() => console.log('Error: could not connect to WordPress.'))
+
     }
 
     /**
@@ -139,14 +134,24 @@
         return resp;
     }
 
+    function removeCustomColorPaletteCSS() {
+        global_colors_accent_data.forEach((global_color) => {
+            let slug = global_color.slug;
+            let palette = $('[aria-label="' + slug + '"]');
+            palette.remove();
+        });
+    }
+
+    /**
+     * 
+     */
     function updateGlobalColorControlCSS() {
-        console.log(global_colors_accent_data);
         // change customizer palette colors
         global_colors_accent_data.forEach((global_color) => {
             let slug = global_color.slug;
             let color_palette = $('[aria-label="' + slug + '"]');
             color_palette.css({'color' : global_color.color});
-        })
+        });
     }
 
     /**
