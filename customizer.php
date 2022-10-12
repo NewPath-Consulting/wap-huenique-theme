@@ -1,5 +1,7 @@
 <?php
 
+use WAWP\Log as Log;
+
 //nosegraze tutorial https://www.nosegraze.com/customizer-settings-wordpress-theme/
 
 class Generatepress_Child_Customizer {
@@ -92,19 +94,29 @@ class Generatepress_Child_Customizer {
 
         $palette = get_option(self::CUSTOM_COLOR_PALETTE);
 
-        if (!$palette) return $settings;
-
         $accent_colors_exist = false;
 
-        foreach ($settings['global_colors'] as &$global_color) {
+        // loop through saved global colors looking for accent colors
+        foreach ($settings['global_colors'] as $idx => &$global_color) {
             $slug = $global_color['slug'];
-            if (array_key_exists($slug, $palette)) {
-                $global_color['color'] = $palette[$slug]['color'];
-                $accent_colors_exist = true;
+
+            // look for accent color slug, skip if default color
+            if (!array_key_exists($slug, $palette)) continue;
+
+            // if image upload is empty, remove old custom colors
+            if (!$palette[$slug]['color']) {
+                unset($settings['global_colors'][$idx]);
+                continue;
             } 
+
+            // update the color
+            $global_color['color'] = $palette[$slug]['color'];
+            $accent_colors_exist = true;
+
         }
 
-        if (!$accent_colors_exist) {
+        // if accent colors aren't in global palette yet, add them
+        if ($palette && !$accent_colors_exist) {
             $settings['global_colors'] = array_merge(
                 $settings['global_colors'], 
                 $palette
@@ -145,10 +157,9 @@ class Generatepress_Child_Customizer {
     public function update_custom_palette($request) {
 
         $palette = json_decode($request->get_body(), 1);
-        
-        // update custom palette
-        $update = update_option(self::CUSTOM_COLOR_PALETTE, $palette);
 
+        $update = update_option(self::CUSTOM_COLOR_PALETTE, $palette);
+        
         $response = new WP_REST_Response($update, 200);
 
         // Set headers.
