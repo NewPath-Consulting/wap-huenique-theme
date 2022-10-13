@@ -61,6 +61,7 @@ class Generatepress_Child_Customizer {
      * @return void
      */
     public function customize_preview_js() {
+        // enqueue customizer preview script
         wp_enqueue_script(
             'wap_customize_preview_js', 
             get_stylesheet_directory_uri() . '/js/customizer-preview.js', 
@@ -163,7 +164,9 @@ class Generatepress_Child_Customizer {
         $response = new WP_REST_Response($update, 200);
 
         // Set headers.
-        $response->set_headers([ 'Cache-Control' => 'must-revalidate, no-cache, no-store, private' ]);
+        $response->set_headers([ 
+            'Cache-Control' => 'must-revalidate, no-cache, no-store, private' 
+        ]);
 
         return $response;
 

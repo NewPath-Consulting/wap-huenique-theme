@@ -86,6 +86,8 @@
                         let logo_upload_flag = parent.wp.customize.instance('logo_toggle').get();
                         if (logo_upload_flag) {
                             parent.wp.customize('custom_logo', field => field.set(to));
+                            // update logo with jquery
+                            $('.header-image').attr('src', to);
                         }
 
                     }
