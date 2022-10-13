@@ -106,6 +106,11 @@
 
         removeCustomColorPaletteCSS();
 
+        // delete color from palette object
+        global_colors_accent_data.forEach((global_color) => {
+            delete global_color.color;
+        })
+
         // send empty palette
         sendCustomPalette(global_colors_accent_data)
         .then((resp) => console.log(resp.json()))
@@ -134,23 +139,37 @@
         return resp;
     }
 
+    /**
+     * Uses jQuery to visually remove the custom color palette button controls
+     * from the customizer.
+     */
     function removeCustomColorPaletteCSS() {
         global_colors_accent_data.forEach((global_color) => {
+            // find palette button with corresponding slug
             let slug = global_color.slug;
-            let palette = $('[aria-label="' + slug + '"]');
-            palette.remove();
+            let palette_button = $('[aria-label="' + slug + '"]');
+
+            // set accent color variables to transparent white
+            palette_button.css({'color' : '#ffffff00'});
+
+            document.documentElement.style.setProperty('--' + slug, '#ffffff00');
         });
     }
 
     /**
-     * 
+     * Uses CSS to update the color of the custom color palette buttons in real
+     * time, when the image is uploaded.
      */
     function updateGlobalColorControlCSS() {
         // change customizer palette colors
         global_colors_accent_data.forEach((global_color) => {
+            // find palette button with corresponding slug
             let slug = global_color.slug;
-            let color_palette = $('[aria-label="' + slug + '"]');
-            color_palette.css({'color' : global_color.color});
+            let palette_button = $('[aria-label="' + slug + '"]');
+
+            // change CSS variable and palette button color
+            document.documentElement.style.setProperty('--' + slug, global_color.color);
+            palette_button.css({'color' : global_color.color});
         });
     }
 
