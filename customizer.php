@@ -101,15 +101,17 @@ class Generatepress_Child_Customizer {
         foreach ($settings['global_colors'] as $idx => &$global_color) {
             $slug = $global_color['slug'];
 
-            // look for accent color slug, skip if default color (first accent is default)
-            if (!array_key_exists($slug, $palette) && $slug != 'accent') {
-                continue;
-            } else {
-                $accent_colors_exist = true;
+            // look for custom accent colors
+            if (array_key_exists($slug, $palette) && $slug != 'accent') {
+                if ($slug != 'accent') {
+                    $accent_colors_exist = true;
+                }
+            
+                // update the color
+                $global_color['color'] = $palette[$slug]['color'];
+            } else if ($slug == 'accent') {
+                unset($settings['global_colors'][$idx]);
             }
-
-            // update the color
-            $global_color['color'] = $palette[$slug]['color'];
 
         }
 
