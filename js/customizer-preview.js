@@ -1,10 +1,12 @@
 (function($) {
 
+    let default_color = '#ffffff00';
+
     let global_colors_accent_data = [
-        { name : 'Accent', slug : 'accent' },
-        { name : 'Accent 2', slug : 'accent-2' },
-        { name : 'Accent 3', slug : 'accent-3' },
-        { name : 'Accent 4', slug : 'accent-4' },
+        { name : 'Accent', slug : 'accent', color : default_color },
+        { name : 'Accent 2', slug : 'accent-2', color : default_color },
+        { name : 'Accent 3', slug : 'accent-3', color : default_color },
+        { name : 'Accent 4', slug : 'accent-4', color : default_color },
     ];
 
     // runs when logo upload is updated
@@ -110,7 +112,7 @@
 
         // delete color from palette object
         global_colors_accent_data.forEach((global_color) => {
-            delete global_color.color;
+            global_color.color = default_color;
         })
 
         // send empty palette
@@ -152,9 +154,9 @@
             let palette_button = $('[aria-label="' + slug + '"]');
 
             // set accent color variables to transparent white
-            palette_button.css({'color' : '#ffffff00'});
+            palette_button.css({'color' : default_color});
 
-            document.documentElement.style.setProperty('--' + slug, '#ffffff00');
+            document.documentElement.style.setProperty('--' + slug, default_color);
         });
     }
 

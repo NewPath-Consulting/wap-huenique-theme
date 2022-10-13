@@ -119,6 +119,33 @@ class Generatepress_Child_Customizer {
                 $settings['global_colors'], 
                 $palette
             );
+        } else if (!$palette) {
+            // add default palette if it's not saved
+            $settings['global_colors'] = array_merge(
+                $settings['global_colors'],
+                array(
+                    array(
+                        'slug' => 'accent',
+                        'name' => 'Accent',
+                        'color' => '#ffffff00'
+                    ),
+                    array(
+                        'slug' => 'accent-2',
+                        'name' => __(sprintf('Accent %s', 2), 'generatepress'),
+                        'color' => '#ffffff00'
+                    ),
+                    array(
+                        'slug' => 'accent-3',
+                        'name' => __(sprintf('Accent %s', 3), 'generatepress'),
+                        'color' => '#ffffff00'
+                    ),
+                    array(
+                        'slug' => 'accent-4',
+                        'name' => __(sprintf('Accent %s', 4), 'generatepress'),
+                        'color' => '#ffffff00'
+                    ),
+                )
+            );
         }
 
 
