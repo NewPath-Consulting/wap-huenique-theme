@@ -104,12 +104,6 @@ class Generatepress_Child_Customizer {
             // look for accent color slug, skip if default color
             if (!array_key_exists($slug, $palette)) continue;
 
-            // if image upload is empty, remove old custom colors
-            if (!$palette[$slug]['color']) {
-                unset($settings['global_colors'][$idx]);
-                continue;
-            } 
-
             // update the color
             $global_color['color'] = $palette[$slug]['color'];
             $accent_colors_exist = true;
