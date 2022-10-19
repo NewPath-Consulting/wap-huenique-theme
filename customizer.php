@@ -90,43 +90,14 @@ class Generatepress_Child_Customizer {
      */
     public function customize_global_colors($settings) {
 
-        // add default colors
-        $settings['global_colors'] = array(
-            array(
-                'name' => __( 'Contrast', 'generatepress' ),
-                'slug' => 'contrast',
-                'color' => '#222222',
-            ),
-            array(
-                /* translators: Contrast number */
-                'name' => sprintf( __( 'Contrast %s', 'generatepress' ), '2' ),
-                'slug' => 'contrast-2',
-                'color' => '#575760',
-            ),
-            array(
-                /* translators: Contrast number */
-                'name' => sprintf( __( 'Contrast %s', 'generatepress' ), '3' ),
-                'slug' => 'contrast-3',
-                'color' => '#b2b2be',
-            ),
-            array(
-                'name' => __( 'Base', 'generatepress' ),
-                'slug' => 'base',
-                'color' => '#f0f0f0',
-            ),
-            array(
-                /* translators: Base number */
-                'name' => sprintf( __( 'Base %s', 'generatepress' ), '2' ),
-                'slug' => 'base-2',
-                'color' => '#f7f8f9',
-            ),
-            array(
-                /* translators: Base number */
-                'name' => sprintf( __( 'Base %s', 'generatepress' ), '3' ),
-                'slug' => 'base-3',
-                'color' => '#ffffff',
-            )
-        );
+        // set logo if upload flag is on
+        $logo_upload_flag = get_option(self::LOGO_UPLOAD_FLAG);
+        if ($logo_upload_flag) {
+            $logo = get_option('logo');
+            $settings['logo'] = $logo;
+        } else {
+            $settings['logo'] = '';
+        }
 
         // get custom palette in options table
         $palette = get_option(self::CUSTOM_COLOR_PALETTE);
@@ -135,14 +106,27 @@ class Generatepress_Child_Customizer {
 
         // if custom palette hasn't been set yet, add accent colors with default color
         if (!$palette) {
+            // find default accent and change it to default color
+            $accent_key = array_search(
+                'accent', 
+                array_column($settings['global_colors'], 'slug')
+            );
+
+            // if accent exists, change it. if not, add it
+            if ($accent_key) {
+                $settings['global_colors'][$accent_key]['color'] = $default_color;
+            } else {
+                $settings['global_colors'][] = array(
+                    'slug' => 'accent',
+                    'name' => __('Accent', 'generatepress'),
+                    'color' => $default_color
+                );
+            }
+            
+            // add other accent colors with default color
             $settings['global_colors'] = array_merge(
                 $settings['global_colors'],
                 array(
-                    array(
-                        'slug' => 'accent',
-                        'name' => __('Accent', 'generatepress'),
-                        'color' => $default_color
-                    ),
                     array(
                         'slug' => 'accent-2',
                         'name' => __(sprintf('Accent %s', 2), 'generatepress'),
@@ -161,16 +145,23 @@ class Generatepress_Child_Customizer {
                 )
             );
         } else {
-            $settings['global_colors'] = array_merge($settings['global_colors'], $palette);
-        }
+            // loop through custom palette
+            foreach ($palette as $color) {
+                // see if color is already in global palette
+                $key = array_search(
+                    $palette['slug'], 
+                    array_column($settings['global_colors'], 'slug')
+                );
+            
+                if ($key) {
+                    // if it is, change the color
+                    $settings['global_colors'][$key]['color'] = $color['color'];
+                } else {
+                    // if not, append the new color to the global palette
+                    $settings['global_colors'][] = $color;
+                }
+            }
 
-        // set logo if upload flag is on
-        $logo_upload_flag = get_option(self::LOGO_UPLOAD_FLAG);
-        if ($logo_upload_flag) {
-            $logo = get_option('logo');
-            $settings['logo'] = $logo;
-        } else {
-            $settings['logo'] = '';
         }
 
         return $settings;
