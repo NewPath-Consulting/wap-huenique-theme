@@ -90,10 +90,79 @@ class Generatepress_Child_Customizer {
      */
     public function customize_global_colors($settings) {
 
+        // add default colors
+        $settings['global_colors'] = array(
+            array(
+                'name' => __( 'Contrast', 'generatepress' ),
+                'slug' => 'contrast',
+                'color' => '#222222',
+            ),
+            array(
+                /* translators: Contrast number */
+                'name' => sprintf( __( 'Contrast %s', 'generatepress' ), '2' ),
+                'slug' => 'contrast-2',
+                'color' => '#575760',
+            ),
+            array(
+                /* translators: Contrast number */
+                'name' => sprintf( __( 'Contrast %s', 'generatepress' ), '3' ),
+                'slug' => 'contrast-3',
+                'color' => '#b2b2be',
+            ),
+            array(
+                'name' => __( 'Base', 'generatepress' ),
+                'slug' => 'base',
+                'color' => '#f0f0f0',
+            ),
+            array(
+                /* translators: Base number */
+                'name' => sprintf( __( 'Base %s', 'generatepress' ), '2' ),
+                'slug' => 'base-2',
+                'color' => '#f7f8f9',
+            ),
+            array(
+                /* translators: Base number */
+                'name' => sprintf( __( 'Base %s', 'generatepress' ), '3' ),
+                'slug' => 'base-3',
+                'color' => '#ffffff',
+            )
+        );
+
         // get custom palette in options table
         $palette = get_option(self::CUSTOM_COLOR_PALETTE);
 
         $default_color = '#ffffff00';
+
+        // if custom palette hasn't been set yet, add accent colors with default color
+        if (!$palette) {
+            $settings['global_colors'] = array_merge(
+                $settings['global_colors'],
+                array(
+                    array(
+                        'slug' => 'accent',
+                        'name' => __('Accent', 'generatepress'),
+                        'color' => $default_color
+                    ),
+                    array(
+                        'slug' => 'accent-2',
+                        'name' => __(sprintf('Accent %s', 2), 'generatepress'),
+                        'color' => $default_color
+                    ),
+                    array(
+                        'slug' => 'accent-3',
+                        'name' => __(sprintf('Accent %s', 3), 'generatepress'),
+                        'color' => $default_color
+                    ),
+                    array(
+                        'slug' => 'accent-4',
+                        'name' => __(sprintf('Accent %s', 4), 'generatepress'),
+                        'color' => $default_color
+                    ),
+                )
+            );
+        } else {
+            $settings['global_colors'] = array_merge($settings['global_colors'], $palette);
+        }
 
         // set logo if upload flag is on
         $logo_upload_flag = get_option(self::LOGO_UPLOAD_FLAG);
@@ -102,45 +171,6 @@ class Generatepress_Child_Customizer {
             $settings['logo'] = $logo;
         } else {
             $settings['logo'] = '';
-        }
-
-        // if custom palette hasn't been set yet, add accent colors with default color
-        if (!$palette) {
-            $accent = array_key_last($settings['global_colors']);
-            if ($settings['global_colors'][$accent]['slug'] == 'accent') {
-                $settings['global_colors'][$accent]['color'] = $default_color;
-            }
-
-            $settings['global_colors'] = array_merge(
-                $settings['global_colors'],
-                array(
-                    array(
-                        'slug' => 'accent',
-                        'name' => __('Accent', 'generatepress'),
-                        'color' => '#ffffff00'
-                    ),
-                    array(
-                        'slug' => 'accent-2',
-                        'name' => __(sprintf('Accent %s', 2), 'generatepress'),
-                        'color' => '#ffffff00'
-                    ),
-                    array(
-                        'slug' => 'accent-3',
-                        'name' => __(sprintf('Accent %s', 3), 'generatepress'),
-                        'color' => '#ffffff00'
-                    ),
-                    array(
-                        'slug' => 'accent-4',
-                        'name' => __(sprintf('Accent %s', 4), 'generatepress'),
-                        'color' => '#ffffff00'
-                    ),
-                )
-            );
-        } else {
-            // otherwise, push each custom color from the palette to the global colors
-            foreach ($palette as $color) {
-                array_push($settings['global_colors'], $color);
-            }
         }
 
         return $settings;
