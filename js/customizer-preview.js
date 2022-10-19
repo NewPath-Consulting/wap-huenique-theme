@@ -1,7 +1,9 @@
 (function($) {
 
+    // set transparent white as default color
     let default_color = '#ffffff00';
 
+    // template data for accent colors
     let global_colors_accent_data = [
         { name : 'Accent', slug : 'accent', color : default_color },
         { name : 'Accent 2', slug : 'accent-2', color : default_color },
@@ -82,10 +84,11 @@
                         .then((resp) => console.log(resp.json()))
                         .catch(() => console.log('Error: could not connect to WordPress.'))
 
+                        // set global colors with new palette
                         parent.wp.customize('generate_settings[global_colors]', field => field.set(global_colors))
 
                         // set custom logo if flag is enabled
-                        let logo_upload_flag = parent.wp.customize.instance('logo_toggle').get();
+                        let logo_upload_flag = parent.wp.customize.instance('wap_theme_logo_toggle').get();
                         if (logo_upload_flag) {
                             parent.wp.customize('custom_logo', field => field.set(to));
                             // update logo with jquery

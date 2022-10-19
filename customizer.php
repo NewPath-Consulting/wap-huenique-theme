@@ -7,7 +7,7 @@ use WAWP\Log as Log;
 class Generatepress_Child_Customizer {
 
     const CUSTOM_COLOR_PALETTE = 'wap_theme_custom_color_palette';
-    const LOGO_UPLOAD_FLAG = 'logo_toggle';
+    const LOGO_UPLOAD_FLAG = 'wap_theme_logo_toggle';
 
 	public function __construct() {
         // add customizer controls
@@ -89,46 +89,34 @@ class Generatepress_Child_Customizer {
      * @return array updated settings
      */
     public function customize_global_colors($settings) {
-        $logo = get_option('logo');
 
-        // TODO: remove custom colors if no image
-
+        // get custom palette in options table
         $palette = get_option(self::CUSTOM_COLOR_PALETTE);
 
-        $accent_colors_exist = false;
+        $default_color = '#ffffff00';
 
-        // loop through saved global colors looking for accent colors
-        foreach ($settings['global_colors'] as $idx => &$global_color) {
-            $slug = $global_color['slug'];
-
-            // look for custom accent colors
-            if (array_key_exists($slug, $palette) && $slug != 'accent') {
-                if ($slug != 'accent') {
-                    $accent_colors_exist = true;
-                }
-            
-                // update the color
-                $global_color['color'] = $palette[$slug]['color'];
-            } else if ($slug == 'accent') {
-                unset($settings['global_colors'][$idx]);
-            }
-
+        // set logo if upload flag is on
+        $logo_upload_flag = get_option(self::LOGO_UPLOAD_FLAG);
+        if ($logo_upload_flag) {
+            $logo = get_option('logo');
+            $settings['logo'] = $logo;
+        } else {
+            $settings['logo'] = '';
         }
 
-        // if accent colors aren't in global palette yet, add them
-        if ($palette && !$accent_colors_exist) {
-            $settings['global_colors'] = array_merge(
-                $settings['global_colors'], 
-                $palette
-            );
-        } else if (!$palette) {
-            // add default palette if it's not saved
+        // if custom palette hasn't been set yet, add accent colors with default color
+        if (!$palette) {
+            $accent = array_key_last($settings['global_colors']);
+            if ($settings['global_colors'][$accent]['slug'] == 'accent') {
+                $settings['global_colors'][$accent]['color'] = $default_color;
+            }
+
             $settings['global_colors'] = array_merge(
                 $settings['global_colors'],
                 array(
                     array(
                         'slug' => 'accent',
-                        'name' => 'Accent',
+                        'name' => __('Accent', 'generatepress'),
                         'color' => '#ffffff00'
                     ),
                     array(
@@ -148,15 +136,11 @@ class Generatepress_Child_Customizer {
                     ),
                 )
             );
-        }
-
-
-        $logo_upload_flag = get_option(self::LOGO_UPLOAD_FLAG);
-
-        if ($logo_upload_flag) {
-            $settings['logo'] = $logo;
         } else {
-            $settings['logo'] = '';
+            // otherwise, push each custom color from the palette to the global colors
+            foreach ($palette as $color) {
+                array_push($settings['global_colors'], $color);
+            }
         }
 
         return $settings;
@@ -176,7 +160,8 @@ class Generatepress_Child_Customizer {
     }
 
     /**
-     * Callback for custom color palette REST route.
+     * Callback for custom color palette REST route. Recieves updated custom
+     * color palette from color picking script.
      *
      * @param WP_REST_Request $request
      * @return WP_REST_Response
@@ -225,12 +210,12 @@ class Generatepress_Child_Customizer {
             )
         );
 
-        $wp_customize->add_setting( 'logo_toggle', array(
+        $wp_customize->add_setting( self::LOGO_UPLOAD_FLAG, array(
             'transport' => 'postMessage',
             'type' => 'option'
         ) );
 
-        $wp_customize->add_control( 'logo_toggle', array(
+        $wp_customize->add_control( self::LOGO_UPLOAD_FLAG, array(
             'label'     => _( 'Add logo to website header' ),
             'type'      => 'checkbox',
             'section'   => 'generate_colors_section',
