@@ -101,15 +101,38 @@ class Generatepress_Child_Customizer {
                 'slug' => 'accent-2',
                 'color' => $color2
             );
-            $settings['global_colors'][] = array(
-                'name' => sprintf(__('Accent %s', 'generatepress'), '3'),
-                'slug' => 'accent-3',
-                'color' => $color1a
-            );
-            $settings['global_colors'][] = array(
-                'name' => sprintf(__('Accent %s', 'generatepress'), '4'),
-                'slug' => 'accent-4',
-                'color' => $color2a
+
+            // if accent exists, change it. if not, add it
+            if ($accent_key) {
+                $settings['global_colors'][$accent_key]['color'] = $default_color;
+            } else {
+                $settings['global_colors'][] = array(
+                    'slug' => 'accent',
+                    'name' => __('Accent', 'generatepress_child'),
+                    'color' => $default_color
+                );
+            }
+            
+            // add other accent colors with default color
+            $settings['global_colors'] = array_merge(
+                $settings['global_colors'],
+                array(
+                    array(
+                        'slug' => 'accent-2',
+                        'name' => __(sprintf('Accent %s', 2), 'generatepress_child'),
+                        'color' => $default_color
+                    ),
+                    array(
+                        'slug' => 'accent-3',
+                        'name' => __(sprintf('Accent %s', 3), 'generatepress_child'),
+                        'color' => $default_color
+                    ),
+                    array(
+                        'slug' => 'accent-4',
+                        'name' => __(sprintf('Accent %s', 4), 'generatepress_child'),
+                        'color' => $default_color
+                    ),
+                )
             );
         }
 
@@ -136,8 +159,8 @@ class Generatepress_Child_Customizer {
                 'logo_control',
                 array(
                     'label'      => __( 'Upload your logo', 'generatepress_child' ),
-                    'description' => __( 'The main colors from your logo will be extracted and used to set your theme colors. <br><br> The colors below will be automatically generated when you upload an image, then you can further modify them or specific elements as desired.<br><br>For best results, make sure your logo has a transparent background (not solid white) and at least two colors.' ),
-                    'section'    => 'logo_colors',
+                    'description' => __( 'The main colors from your logo will be extracted and used to set your theme colors. <br><br> The colors below will be automatically generated when you upload an image, then you can further modify them or specific elements as desired.<br><br>For best results, make sure your logo has a transparent background (not solid white) and at least two colors.', 'generatepress_child' ),
+                    'section'    => 'generate_colors_section',
                     'settings'   => 'logo',
                     'priority' => 9,
                     'transport' => 'postMessage',

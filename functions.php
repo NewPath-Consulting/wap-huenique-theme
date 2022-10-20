@@ -12,4 +12,9 @@ function enqueue_parent_styles() {
     wp_enqueue_style( 'parent-style', get_template_directory_uri().'/style.css' );
 }
 
+add_action('init', 'wap_add_theme_support');
+function wap_add_theme_support() {
+    add_theme_support( 'title_tag' );
+}
+
 $customizer = new Generatepress_Child_Customizer();
