@@ -49,7 +49,6 @@ class Generatepress_Child_Customizer {
         // add image upload control to genpress colors section
         $this->logo_colors_section( $wp_customize );
 
-        $wp_customize->get_control( 'generate_settings[global_colors]' )->transport = 'postMessage';
         // remove genpress color palettes we don't need
         $this->remove_generatepress_options( $wp_customize );
 
