@@ -145,11 +145,13 @@ class Generatepress_Child_Customizer {
                 )
             );
         } else {
+            // TODO: come up with a more efficient way to do this
+            // save entire global palette separately in options?
             // loop through custom palette
             foreach ($palette as $color) {
                 // see if color is already in global palette
                 $key = array_search(
-                    $palette['slug'], 
+                    $color['slug'], 
                     array_column($settings['global_colors'], 'slug')
                 );
             
@@ -213,7 +215,8 @@ class Generatepress_Child_Customizer {
     private function logo_colors_section( $wp_customize ) {
         $wp_customize->add_setting( 'logo', array(
             'transport' => 'postMessage',
-            'type' => 'option'
+            'type' => 'option',
+            'sanitize_callback' => array($this, 'sanitize_logo_upload')
         ) );
 
         $wp_customize->add_control(
@@ -233,7 +236,8 @@ class Generatepress_Child_Customizer {
 
         $wp_customize->add_setting( self::LOGO_UPLOAD_FLAG, array(
             'transport' => 'postMessage',
-            'type' => 'option'
+            'type' => 'option',
+            'sanitize_callback' => 'generate_sanitize_checkbox'
         ) );
 
         $wp_customize->add_control( self::LOGO_UPLOAD_FLAG, array(
@@ -243,6 +247,10 @@ class Generatepress_Child_Customizer {
             'priority'  => 9
         ) );
 
+    }
+
+    public function sanitize_logo_upload( $image ) {
+        return esc_url( $image );
     }
 
     /**
