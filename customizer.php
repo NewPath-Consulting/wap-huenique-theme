@@ -101,69 +101,79 @@ class Generatepress_Child_Customizer {
         // get custom palette in options table
         $palette = get_option(self::CUSTOM_COLOR_PALETTE);
 
+        // set defaults
         $default_color = '#ffffff00';
-
-        // if custom palette hasn't been set yet, add accent colors with default color
-        if (!$palette) {
-            // find default accent and change it to default color
-            $accent_key = array_search(
-                'accent', 
-                array_column($settings['global_colors'], 'slug')
+        $default_accent = array(
+            'slug' => 'accent',
+            'name' => __('Accent', 'generatepress'),
+            'color' => $default_color
+        );
+        $default_palette = array();
+        for ($accent_num = 2; $accent_num <= 4; $accent_num++) {
+            $default_palette[] = array(
+                'slug' => 'accent-' . $accent_num,
+                'name' => __(sprintf('Accent %s', $accent_num), 'generatepress'),
+                'color' => $default_color
             );
-
-            // if accent exists, change it. if not, add it
-            if ($accent_key) {
-                $settings['global_colors'][$accent_key]['color'] = $default_color;
-            } else {
-                $settings['global_colors'][] = array(
-                    'slug' => 'accent',
-                    'name' => __('Accent', 'generatepress'),
-                    'color' => $default_color
-                );
-            }
-            
-            // add other accent colors with default color
-            $settings['global_colors'] = array_merge(
-                $settings['global_colors'],
-                array(
-                    array(
-                        'slug' => 'accent-2',
-                        'name' => __(sprintf('Accent %s', 2), 'generatepress'),
-                        'color' => $default_color
-                    ),
-                    array(
-                        'slug' => 'accent-3',
-                        'name' => __(sprintf('Accent %s', 3), 'generatepress'),
-                        'color' => $default_color
-                    ),
-                    array(
-                        'slug' => 'accent-4',
-                        'name' => __(sprintf('Accent %s', 4), 'generatepress'),
-                        'color' => $default_color
-                    ),
-                )
-            );
-        } else {
-            // loop through custom palette
-            foreach ($palette as $color) {
-                // see if color is already in global palette
-                $key = array_search(
-                    $palette['slug'], 
-                    array_column($settings['global_colors'], 'slug')
-                );
-            
-                if ($key) {
-                    // if it is, change the color
-                    $settings['global_colors'][$key]['color'] = $color['color'];
-                } else {
-                    // if not, append the new color to the global palette
-                    $settings['global_colors'][] = $color;
-                }
-            }
-
         }
 
+        // if global colors don't exist, just add default or color palette
+        if (is_null($settings['global_colors'])) {
+            if ($palette) {
+                // set globals as saved color palette
+                $settings['global_colors'] = $palette;
+            } else {
+                // push single accent onto front of palette array, then set it as globals
+                array_unshift($default_palette, $default_accent);
+                $settings['global_colors'] = $default_palette;
+            }
+        } else {
+            // if globals do already exist, add custom palette with defaults
+
+            // if custom palette exists
+            if ($palette) {
+                // loop through custom palette
+                foreach ($palette as $color) {
+                    // see if color is already in global palette
+                    $key = array_search(
+                        $color['slug'], 
+                        array_column($settings['global_colors'], 'slug')
+                    );
+                
+                    if ($key) {
+                        // if it is, change the color
+                        $settings['global_colors'][$key]['color'] = $color['color'];
+                    } else {
+                        // if not, append the new color to the global palette
+                        $settings['global_colors'][] = $color;
+                    }
+                }
+            } else {
+                // if custom palette does not exist, add defaults
+
+                // find default accent and change it to default color
+                $accent_key = array_search(
+                    'accent', 
+                    array_column($settings['global_colors'], 'slug')
+                );
+
+                // if accent exists, change it. if not, add it as default
+                if ($accent_key) {
+                    $settings['global_colors'][$accent_key]['color'] = $default_color;
+                } else {
+                    $settings['global_colors'][] = $default_accent;
+                }
+                
+                // add other accent colors with default color
+                $settings['global_colors'] = array_merge(
+                    $settings['global_colors'],
+                    $default_palette
+                );
+            }
+        }   
+
         return $settings;
+   
     }
 
     /**
