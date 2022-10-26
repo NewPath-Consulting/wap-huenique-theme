@@ -102,6 +102,12 @@ class Generatepress_Child_Customizer {
             $settings['logo'] = '';
         }
 
+        // update current logo if it hasn't been updated yet
+        $current_logo = get_option( 'site_logo' );
+        if ($current_logo != $settings['logo']) {
+            update_option( 'site_logo', $settings['logo'] );
+        }
+
         // get custom palette in options table
         $palette = get_option(self::CUSTOM_COLOR_PALETTE);
 
