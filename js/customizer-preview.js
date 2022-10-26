@@ -12,12 +12,12 @@
     ];
 
     // runs when logo upload is updated
-    wp.customize('logo', (value) => {
+    wp.customize('wap_theme_logo', (value) => {
         value.bind(function(to) {
             fetch(to)
                 .then(resp => resp.blob())
                 .then(blobobject => {
-                    let image = parent.wp.customize.instance('logo').get();
+                    let image = parent.wp.customize.instance('wap_theme_logo').get();
                     // if blob is not an image, ignore it
                     if (!blobobject.type.includes('image') || image.length == 0) {
                         reset_color_pickers();

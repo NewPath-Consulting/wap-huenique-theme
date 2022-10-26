@@ -6,6 +6,7 @@ use WAWP\Log as Log;
 
 class Generatepress_Child_Customizer {
 
+    const LOGO_IMAGE_UPLOAD = 'wap_theme_logo';
     const CUSTOM_COLOR_PALETTE = 'wap_theme_custom_color_palette';
     const LOGO_UPLOAD_FLAG = 'wap_theme_logo_toggle';
 
@@ -49,7 +50,7 @@ class Generatepress_Child_Customizer {
         // add image upload control to genpress colors section
         $this->logo_colors_section( $wp_customize );
 
-        $wp_customize->get_control( 'generate_settings[global_colors]' )->transport = 'postMessage';
+        // custom_logo is the WP logo upload ID
         $wp_customize->get_control( 'custom_logo' )->transport = 'postMessage';
 
         // remove genpress color palettes we don't need
@@ -95,7 +96,7 @@ class Generatepress_Child_Customizer {
         // set logo if upload flag is on
         $logo_upload_flag = get_option(self::LOGO_UPLOAD_FLAG);
         if ($logo_upload_flag) {
-            $logo = get_option('logo');
+            $logo = get_option( 'wap_theme_logo' );
             $settings['logo'] = $logo;
         } else {
             $settings['logo'] = '';
@@ -223,7 +224,7 @@ class Generatepress_Child_Customizer {
      * @return void
      */
     private function logo_colors_section( $wp_customize ) {
-        $wp_customize->add_setting( 'logo', array(
+        $wp_customize->add_setting( self::LOGO_IMAGE_UPLOAD, array(
             'transport' => 'postMessage',
             'type' => 'option'
         ) );
@@ -236,7 +237,7 @@ class Generatepress_Child_Customizer {
                     'label'      => __( 'Upload your logo', 'generatepress_child' ),
                     'description' => __( 'The main colors from your logo will be extracted and used to set your theme colors. <br><br> The colors below will be automatically generated when you upload an image, then you can further modify them or specific elements as desired.<br><br>For best results, make sure your logo has a transparent background (not solid white) and at least two colors.' ),
                     'section'    => 'generate_colors_section',
-                    'settings'   => 'logo',
+                    'settings'   => self::LOGO_IMAGE_UPLOAD,
                     'priority' => 9,
                     'transport' => 'postMessage',
                 )
@@ -249,7 +250,7 @@ class Generatepress_Child_Customizer {
         ) );
 
         $wp_customize->add_control( self::LOGO_UPLOAD_FLAG, array(
-            'label'     => _( 'Add logo to website header' ),
+            'label'     => _( 'Display logo in website header' ),
             'type'      => 'checkbox',
             'section'   => 'generate_colors_section',
             'priority'  => 9
