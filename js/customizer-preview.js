@@ -89,12 +89,34 @@
 
                     }
 
-                })
-                .catch(() => 
-                    console.log('There was an error downloading the image.')
-                )
+    // triggered when custom logo is updated through the customizer panel
+    wp.customize('custom_logo', (value) => {
 
+        value.bind((to) => {
+            if (to) {
+                // if image exists, enable site id logo flag, disable custom logo flag
+                custom_logo_data[WP_SITE_ID_LOGO_FLAG] = true;
+                custom_logo_data[LOGO_DISPLAY_FLAG] = false;
+                send_custom_logo_data(custom_logo_data)
+                .then((resp) => parent.wp.customize.previewer.refresh())
+                .catch((e) => console.error(e))
+            }
         })
+
+    })
+
+    // triggered when custom logo checkbox is updated
+    wp.customize(LOGO_DISPLAY_FLAG, (value) => {
+        
+        value.bind((to) => {
+            // update new flag value, disable site id flag
+            custom_logo_data[LOGO_DISPLAY_FLAG] = to;
+            custom_logo_data[WP_SITE_ID_LOGO_FLAG] = false;
+            send_custom_logo_data(custom_logo_data)
+            .then((resp) => parent.wp.customize.previewer.refresh())
+            .catch((e) => console.error(e))
+        })
+
     })
 
     /**
@@ -135,6 +157,21 @@
                 'Content-Type' : 'application/json'
             },
             body : JSON.stringify(palette)
+        });
+
+        return resp;
+    }
+
+    const send_custom_logo_data = async(logo_data) => {
+        const API_URL = '/wp-json/wawp-theme/v1/customlogo';
+
+        const resp = await fetch(API_URL, {
+            method : 'POST',
+            headers : {
+                'Accept' : 'application/json',
+                'Content-Type' : 'application/json'
+            },
+            body : JSON.stringify(logo_data) 
         });
 
         return resp;

@@ -8,7 +8,11 @@ class Generatepress_Child_Customizer {
 
     const LOGO_IMAGE_UPLOAD = 'wap_theme_logo';
     const CUSTOM_COLOR_PALETTE = 'wap_theme_custom_color_palette';
-    const LOGO_UPLOAD_FLAG = 'wap_theme_logo_toggle';
+    /**
+     * Option name for the flag indicating whether the user is using the logo
+     * uploaded in `Site Identity`.
+     */
+    const WP_SITE_ID_LOGO_FLAG = 'wap_theme_wp_site_id_logo';
 
 	public function __construct() {
         // add customizer controls
@@ -93,21 +97,6 @@ class Generatepress_Child_Customizer {
      */
     public function customize_global_colors($settings) {
 
-        // set logo if upload flag is on
-        $logo_upload_flag = get_option(self::LOGO_UPLOAD_FLAG);
-        if ($logo_upload_flag) {
-            $logo = get_option( 'wap_theme_logo' );
-            $settings['logo'] = $logo;
-        } else {
-            $settings['logo'] = '';
-        }
-
-        // update current logo if it hasn't been updated yet
-        $current_logo = get_option( 'site_logo' );
-        if ($current_logo != $settings['logo']) {
-            update_option( 'site_logo', $settings['logo'] );
-        }
-
         // get custom palette in options table
         $palette = get_option(self::CUSTOM_COLOR_PALETTE);
 
@@ -182,12 +171,36 @@ class Generatepress_Child_Customizer {
             }
         }   
 
+        // set logo if upload flag is on
+        $logo_upload_flag = get_option(self::LOGO_DISPLAY_FLAG);
+        $wp_site_id_flag = get_option(self::WP_SITE_ID_LOGO_FLAG);
+
+        // if site ID logo is used, skip custom logo display
+        if ($wp_site_id_flag) {
+            return $settings;
+        }
+    
+        // if flag is on AND site id logo is not being used, update
+        if ($logo_upload_flag) {
+            $logo = get_option( 'wap_theme_logo' );
+            $settings['logo'] = $logo;
+        } else {
+            $settings['logo'] = '';
+        }
+
+        // update current logo if it hasn't been updated yet
+        $current_logo = get_option( 'site_logo' );
+        if ($current_logo != $settings['logo']) {
+            update_option( 'site_logo', $settings['logo'] );
+        }
+
         return $settings;
    
     }
 
     /**
-     * Register REST route for obtaining the custom color palette. 
+     * Register REST routes for obtaining and updating custom logo and color
+     * data.
      *
      * @return void
      */
@@ -195,6 +208,12 @@ class Generatepress_Child_Customizer {
         register_rest_route( 'wawp-theme/v1', '/custompalette', array(
             'methods' => WP_REST_Server::EDITABLE,
             'callback' => array($this, 'update_custom_palette'),
+            'permissions_callback' => '__return_true'
+        ) );
+
+        register_rest_route( 'wawp-theme/v1', '/customlogo', array(
+            'methods' => WP_REST_Server::EDITABLE,
+            'callback' => array($this, 'update_custom_logo'),
             'permissions_callback' => '__return_true'
         ) );
     }
@@ -216,6 +235,45 @@ class Generatepress_Child_Customizer {
 
         // Set headers.
         $response->set_headers([ 
+            'Cache-Control' => 'must-revalidate, no-cache, no-store, private' 
+        ]);
+
+        return $response;
+    }
+
+    /**
+     * Callback for custom logo REST route. Called when custom logo is changed
+     * through the default WP setting or logo display flag is changed.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function update_custom_logo($request) {
+        // TODO: how to indicate user has set a different custom logo?
+        // set flag
+        // make separate update_logo function to use here and in GP filter
+
+        $logo_flag = json_decode($request->get_body(), 1);
+
+        $logo_flag_value = $logo_flag[self::LOGO_DISPLAY_FLAG];
+        $wp_site_id_flag = $logo_flag[self::WP_SITE_ID_LOGO_FLAG];
+
+        $update = array();
+
+        $update[self::LOGO_DISPLAY_FLAG] = update_option(
+            self::LOGO_DISPLAY_FLAG, 
+            $logo_flag_value
+        );
+        $update[self::WP_SITE_ID_LOGO_FLAG] = update_option(
+            self::WP_SITE_ID_LOGO_FLAG, 
+            $wp_site_id_flag
+        );
+
+        // $update = update_option(self::LOGO_DISPLAY_FLAG, $logo_flag[self::LOGO_DISPLAY_FLAG]);
+
+        $response = new WP_REST_Response($update, 200);
+
+        $response->set_headers([
             'Cache-Control' => 'must-revalidate, no-cache, no-store, private' 
         ]);
 
