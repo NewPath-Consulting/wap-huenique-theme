@@ -6,8 +6,27 @@ use WAWP\Log as Log;
 
 class Generatepress_Child_Customizer {
 
+    /**
+     * Customizer setting and option name for the uploaded logo image.
+     * 
+     * @var string
+     */
     const LOGO_IMAGE_UPLOAD = 'wap_theme_logo';
+
+    /**
+     * Option name for the custom color palette.
+     * 
+     * @var string
+     */
     const CUSTOM_COLOR_PALETTE = 'wap_theme_custom_color_palette';
+
+    /**
+     * Customizer setting and option name for the display logo toggle.
+     * 
+     * @var string
+     */
+    const LOGO_DISPLAY_FLAG = 'wap_theme_logo_toggle';
+
     /**
      * Option name for the flag indicating whether the user is using the logo
      * uploaded in `Site Identity`.
@@ -281,6 +300,8 @@ class Generatepress_Child_Customizer {
 
     }
 
+    // TODO: handle user changing custom color palettes
+
     /**
      * Adds settings and controls for the logo upload and color pickers.
      *
@@ -308,12 +329,12 @@ class Generatepress_Child_Customizer {
             )
         );
 
-        $wp_customize->add_setting( self::LOGO_UPLOAD_FLAG, array(
+        $wp_customize->add_setting( self::LOGO_DISPLAY_FLAG, array(
             'transport' => 'postMessage',
             'type' => 'option'
         ) );
 
-        $wp_customize->add_control( self::LOGO_UPLOAD_FLAG, array(
+        $wp_customize->add_control( self::LOGO_DISPLAY_FLAG, array(
             'label'     => _( 'Display logo in website header' ),
             'type'      => 'checkbox',
             'section'   => 'generate_colors_section',
@@ -391,11 +412,5 @@ class Generatepress_Child_Customizer {
         $wp_customize->remove_control( 'generate_settings[form_border_color_focus]' );
 
     }  
-
-    /* Sanatizing is good and should be done? TODO sanitize image
-    public function sanitize_checkbox( $input ) {
-        return ( $input === true ) ? true : false;
-    }
-    */
 
 }

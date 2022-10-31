@@ -11,83 +11,97 @@
         { name : 'Accent 4', slug : 'accent-4', color : default_color },
     ];
 
+    const LOGO_DISPLAY_FLAG = 'wap_theme_logo_toggle';
+    const WP_SITE_ID_LOGO_FLAG = 'wap_theme_wp_site_id_logo';
+
+    let custom_logo_data = {
+        'wap_theme_logo_toggle' : false,
+        'wap_theme_wp_site_id_logo' : false
+    };
+
     // runs when logo upload is updated
     wp.customize('wap_theme_logo', (value) => {
         value.bind(function(to) {
+            // fetch new logo value and obtain the blob object
             fetch(to)
-                .then(resp => resp.blob())
-                .then(blobobject => {
-                    let image = parent.wp.customize.instance('wap_theme_logo').get();
-                    // if blob is not an image, ignore it
-                    if (!blobobject.type.includes('image') || image.length == 0) {
-                        reset_color_pickers();
-                        return;
-                    }
+            .then(resp => resp.blob())
+            .then(blobobject => {
+                let image = parent.wp.customize.instance('wap_theme_logo').get();
+                // if blob is not an image, ignore it
+                if (!blobobject.type.includes('image') || image.length == 0) {
+                    reset_color_pickers();
+                    return;
+                }
 
-                    var img = new Image();
-                    img.src = to;
+                var img = new Image();
+                img.src = to;
 
-                    // wait for image to load, then get palette
-                    img.onload = () => {
-                        let color_thief = new ColorThief();
-                        let image_palette = color_thief.getPalette(img, 2);
+                // wait for image to load, then get palette
+                img.onload = () => {
+                    let color_thief = new ColorThief();
+                    let image_palette = color_thief.getPalette(img, 2);
 
-                        // convert rgb to hex
-                        let palette_hex = image_palette.map((rgb) =>
-                            rgbToHex(rgb[0], rgb[1], rgb[2]) 
-                        );
+                    // convert rgb to hex
+                    let palette_hex = image_palette.map((rgb) =>
+                        rgb_to_hex(rgb[0], rgb[1], rgb[2]) 
+                    );
 
-                        // convert hex to hsl
-                        let palette_hsl = palette_hex.map((hex) => 
-                            hexToHSL(hex)
-                        );
+                    // convert hex to hsl
+                    let palette_hsl = palette_hex.map((hex) => 
+                        hex_to_hsl(hex)
+                    );
 
-                        // find accent colors and convert to hex
-                        let accent3 = find_accent_color(palette_hsl[0]);
-                        let accent4 = find_accent_color(palette_hsl[1]);
+                    // find accent colors and convert to hex
+                    let accent3 = find_accent_color(palette_hsl[0]);
+                    let accent4 = find_accent_color(palette_hsl[1]);
+                    accent3 = hsl_to_hex(accent3);
+                    accent4 = hsl_to_hex(accent4);
 
-                        accent3 = hslToHex(accent3);
-                        accent4 = hslToHex(accent4);
+                    // construct custom accent color palette
+                    let palette = {
+                        'accent' : palette_hex[0],
+                        'accent-2' : palette_hex[1],
+                        'accent-3' : accent3,
+                        'accent-4' : accent4
+                    };
 
-                        // construct custom accent color palette
-                        let palette = {
-                            'accent' : palette_hex[0],
-                            'accent-2' : palette_hex[1],
-                            'accent-3' : accent3,
-                            'accent-4' : accent4
-                        };
+                    // get current global colors
+                    let global_colors = parent.wp.customize.instance(
+                        'generate_settings[global_colors]'
+                    ).get();
 
-                        // get current global colors
-                        let global_colors = parent.wp.customize.instance('generate_settings[global_colors]').get();
+                    // loop through the accent color data template
+                    global_colors_accent_data.forEach((global_color) => {
+                        // add color value to new global color object
+                        global_color.color = palette[global_color.slug];
 
-                        // loop through the accent color data template
-                        global_colors_accent_data.forEach((global_color) => {
-                            // add color value to new global color object
-                            global_color.color = palette[global_color.slug];
+                        // look for accent color slug in saved global colors
+                        global_colors.find((color, i) => {
 
-                            // look for accent color slug in saved global colors
-                            global_colors.find((color, i) => {
-
-                                // if accent value already exists, replace it
-                                if (color.slug === global_color.slug) {
-                                    global_colors[i].color = global_color.color;
-                                    return true;
-                                } 
-                            });
+                            // if accent value already exists, replace it
+                            if (color.slug === global_color.slug) {
+                                global_colors[i].color = global_color.color;
+                                return true;
+                            } 
                         });
+                    });
 
-                        // use css to change color of palettes before they are saved
-                        updateGlobalColorControlCSS();
+                    // use css to change color of palettes before they are saved
+                    update_global_palette_button_css();
 
-                        // send palette to rest route
-                        sendCustomPalette(global_colors_accent_data)
-                        .then((resp) => console.log(resp.json()))
-                        .catch(() => console.log('Error: could not connect to WordPress.'))
+                    // send palette to rest route
+                    send_custom_palette(global_colors_accent_data)
+                    .catch((e) => console.error(e))
 
-                        // force customizer preview to refresh
-                        parent.wp.customize.previewer.refresh();
+                    // force customizer preview to refresh
+                    parent.wp.customize.previewer.refresh();
 
-                    }
+                }
+
+            })
+            .catch((e) => console.error(e))
+        })
+    })
 
     // triggered when custom logo is updated through the customizer panel
     wp.customize('custom_logo', (value) => {
@@ -107,7 +121,7 @@
 
     // triggered when custom logo checkbox is updated
     wp.customize(LOGO_DISPLAY_FLAG, (value) => {
-        
+
         value.bind((to) => {
             // update new flag value, disable site id flag
             custom_logo_data[LOGO_DISPLAY_FLAG] = to;
@@ -125,7 +139,7 @@
      */
     function reset_color_pickers() {
 
-        removeCustomColorPaletteCSS();
+        remove_global_palette_button_css();
 
         // delete color from palette object
         global_colors_accent_data.forEach((global_color) => {
@@ -133,7 +147,7 @@
         })
 
         // send empty palette
-        sendCustomPalette(global_colors_accent_data)
+        send_custom_palette(global_colors_accent_data)
         .then((resp) => console.log(resp.json()))
         .catch(() => console.log('Error: could not connect to WordPress.'))
 
@@ -147,7 +161,7 @@
      * @param {array} palette 
      * @returns {Promise} 
      */
-    const sendCustomPalette = async(palette) => {
+    const send_custom_palette = async(palette) => {
         const API_URL = '/wp-json/wawp-theme/v1/custompalette';
 
         const resp = await fetch(API_URL, {
@@ -181,7 +195,7 @@
      * Uses jQuery to visually remove the custom color palette button controls
      * from the customizer.
      */
-    function removeCustomColorPaletteCSS() {
+    function remove_global_palette_button_css() {
         global_colors_accent_data.forEach((global_color) => {
             // find palette button with corresponding slug
             let slug = global_color.slug;
@@ -198,7 +212,7 @@
      * Uses CSS to update the color of the custom color palette buttons in real
      * time, when the image is uploaded.
      */
-    function updateGlobalColorControlCSS() {
+    function update_global_palette_button_css() {
         // change customizer palette colors
         global_colors_accent_data.forEach((global_color) => {
             // find palette button with corresponding slug
@@ -219,7 +233,7 @@
      * @param {int} b 
      * @returns {string} hex color value
      */
-    const rgbToHex = (r, g, b) => '#' + [r, g, b].map(x => {
+    const rgb_to_hex = (r, g, b) => '#' + [r, g, b].map(x => {
         const hex = x.toString(16)
         return hex.length === 1 ? '0' + hex : hex
     }).join('')
@@ -231,7 +245,7 @@
      * @param {string} H hex value 
      * @returns {array} array of HSL values in the format [h, s, l]
      */
-    function hexToHSL(H) {
+    function hex_to_hsl(H) {
         // Convert hex to RGB first
         let r = 0, g = 0, b = 0;
         if (H.length == 4) {
@@ -289,7 +303,7 @@
      * @param {int} l 
      * @returns {string} hex color value
      */
-    function hslToHex(hsl) {
+    function hsl_to_hex(hsl) {
         let h = hsl['h'];
         let s = hsl['s'];
         let l = hsl['l'];
