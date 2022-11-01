@@ -103,6 +103,17 @@
         })
     })
 
+    // triggered when user changes global color palette
+    wp.customize('generate_settings[global_colors]', (value) => {
+
+        value.bind((to) => {
+            // send updated custom palette to rest route, then update previewer
+            send_custom_palette(to)
+            .then((resp) => parent.wp.customize.previewer.refresh())
+            .catch((e) => console.error(e))
+        })
+    })
+
     // triggered when custom logo is updated through the customizer panel
     wp.customize('custom_logo', (value) => {
 
