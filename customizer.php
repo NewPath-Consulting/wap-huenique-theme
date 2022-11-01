@@ -48,10 +48,10 @@ class Generatepress_Child_Customizer {
         );
 
         // add filters to customize the generatepress global colors
-        add_filter( 
-            'generate_option_defaults', 
-            array( $this, 'customize_global_colors' ) 
-        );
+        // add_filter( 
+        //     'generate_option_defaults', 
+        //     array( $this, 'customize_global_colors' ) 
+        // );
         add_filter( 
             'option_generate_settings', 
             array( $this, 'customize_global_colors' ) 
@@ -74,7 +74,10 @@ class Generatepress_Child_Customizer {
         $this->logo_colors_section( $wp_customize );
 
         // custom_logo is the WP logo upload ID
+        // change transport to handle changes to this control in javascript
         $wp_customize->get_control( 'custom_logo' )->transport = 'postMessage';
+        // handle changes to GP global color palette in javascript
+        $wp_customize->get_control( 'generate_settings[global_colors]' )->transport = 'postMessage';
 
         // remove genpress color palettes we don't need
         $this->remove_generatepress_options( $wp_customize );
@@ -120,6 +123,8 @@ class Generatepress_Child_Customizer {
         $palette = get_option(self::CUSTOM_COLOR_PALETTE);
 
         // set defaults
+        
+        // default color is transparent white
         $default_color = '#ffffff00';
         $default_accent = array(
             'slug' => 'accent',
@@ -135,7 +140,7 @@ class Generatepress_Child_Customizer {
             );
         }
 
-        // if global colors don't exist, just add default or color palette
+        // if global colors don't exist, add the palette or default if it doesn't exist
         if (is_null($settings['global_colors'])) {
             if ($palette) {
                 // set globals as saved color palette
@@ -248,13 +253,14 @@ class Generatepress_Child_Customizer {
      */
     public function update_custom_palette($request) {
 
+        // get palette sent in request
         $palette = json_decode($request->get_body(), 1);
 
+        // update custom palette option with new values
         $update = update_option(self::CUSTOM_COLOR_PALETTE, $palette);
         
+        // send back update result
         $response = new WP_REST_Response($update, 200);
-
-        // Set headers.
         $response->set_headers([ 
             'Cache-Control' => 'must-revalidate, no-cache, no-store, private' 
         ]);
@@ -270,17 +276,14 @@ class Generatepress_Child_Customizer {
      * @return WP_REST_Response
      */
     public function update_custom_logo($request) {
-        // TODO: how to indicate user has set a different custom logo?
-        // set flag
-        // make separate update_logo function to use here and in GP filter
 
+        // retrieve logo flag values sent in request
         $logo_flag = json_decode($request->get_body(), 1);
-
         $logo_flag_value = $logo_flag[self::LOGO_DISPLAY_FLAG];
         $wp_site_id_flag = $logo_flag[self::WP_SITE_ID_LOGO_FLAG];
 
+        // update logo flags with new values and store result
         $update = array();
-
         $update[self::LOGO_DISPLAY_FLAG] = update_option(
             self::LOGO_DISPLAY_FLAG, 
             $logo_flag_value
@@ -290,10 +293,8 @@ class Generatepress_Child_Customizer {
             $wp_site_id_flag
         );
 
-        // $update = update_option(self::LOGO_DISPLAY_FLAG, $logo_flag[self::LOGO_DISPLAY_FLAG]);
-
+        // send back update results
         $response = new WP_REST_Response($update, 200);
-
         $response->set_headers([
             'Cache-Control' => 'must-revalidate, no-cache, no-store, private' 
         ]);
