@@ -158,12 +158,14 @@ class Generatepress_Child_Customizer {
                         array_column($settings['global_colors'], 'slug')
                     );
                 
-                    if ($key) {
-                        // if it is, change the color
-                        $settings['global_colors'][$key]['color'] = $color['color'];
-                    } else {
-                        // if not, append the new color to the global palette
+                    // check if slug was found, need to use strict comparison
+                    // because it could return 0 if element was found at first pos
+                    if ($key === false) {
+                        // if color doesn't exist yet, append it
                         $settings['global_colors'][] = $color;
+                    } else {
+                        // if color already exists, just change its value
+                        $settings['global_colors'][$key]['color'] = $color['color'];
                     }
                 }
             } else {
