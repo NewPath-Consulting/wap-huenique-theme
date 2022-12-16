@@ -7,8 +7,8 @@ require_once __DIR__ . '/customizer.php';
  * Only edit this file if you have direct access to it on your server (to fix errors if they happen).
  */
 
-add_action( 'wp_enqueue_scripts', 'enqueue_parent_styles' );
-function enqueue_parent_styles() {
+add_action( 'wp_enqueue_scripts', 'wap_theme_enqueue_parent_styles' );
+function wap_theme_enqueue_parent_styles() {
     wp_enqueue_style( 'parent-style', get_template_directory_uri().'/style.css' );
 }
 
