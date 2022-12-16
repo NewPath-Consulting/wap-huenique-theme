@@ -48,10 +48,10 @@ class Generatepress_Child_Customizer {
         );
 
         // add filters to customize the generatepress global colors
-        // add_filter( 
-        //     'generate_option_defaults', 
-        //     array( $this, 'customize_global_colors' ) 
-        // );
+        add_filter( 
+            'generate_option_defaults', 
+            array( $this, 'customize_global_colors' ) 
+        );
         add_filter( 
             'option_generate_settings', 
             array( $this, 'customize_global_colors' ) 
@@ -215,10 +215,9 @@ class Generatepress_Child_Customizer {
         }
 
         // update current logo if it hasn't been updated yet
-        $current_logo = get_option( 'site_logo' );
-        if ($current_logo != $settings['logo']) {
-            update_option( 'site_logo', $settings['logo'] );
-        }
+        // $current_logo = get_option( 'site_logo' );
+        // if ($current_logo != $settings['logo']) {
+        update_option( 'site_logo', $settings['logo'] );
 
         return $settings;
    
