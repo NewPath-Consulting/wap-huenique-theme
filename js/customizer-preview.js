@@ -91,13 +91,12 @@
 
                     // send palette to rest route
                     send_custom_palette(global_colors_accent_data)
+                    .then((resp) => {
+                        parent.wp.customize.previewer.refresh()
+                    })
                     .catch((e) => console.error(e))
 
-                    // force customizer preview to refresh
-                    parent.wp.customize.previewer.refresh();
-
                 }
-
             })
             .catch((e) => console.error(e))
         })
@@ -109,7 +108,9 @@
         value.bind((to) => {
             // send updated custom palette to rest route, then update previewer
             send_custom_palette(to)
-            .then((resp) => parent.wp.customize.previewer.refresh())
+            .then((resp) => {
+                parent.wp.customize.previewer.refresh()
+            })
             .catch((e) => console.error(e))
         })
     })
@@ -122,8 +123,14 @@
                 // if image exists, enable site id logo flag, disable custom logo flag
                 custom_logo_data[WP_SITE_ID_LOGO_FLAG] = true;
                 custom_logo_data[LOGO_DISPLAY_FLAG] = false;
+
+                // uncheck custom logo toggle
+                parent.wp.customize(LOGO_DISPLAY_FLAG, field => field.set(false))
+
                 send_custom_logo_data(custom_logo_data)
-                .then((resp) => parent.wp.customize.previewer.refresh())
+                .then((resp) => {
+                    parent.wp.customize.previewer.refresh()
+                })
                 .catch((e) => console.error(e))
             }
         })
@@ -138,7 +145,9 @@
             custom_logo_data[LOGO_DISPLAY_FLAG] = to;
             custom_logo_data[WP_SITE_ID_LOGO_FLAG] = false;
             send_custom_logo_data(custom_logo_data)
-            .then((resp) => parent.wp.customize.previewer.refresh())
+            .then((resp) => {
+                parent.wp.customize.previewer.refresh()
+            })
             .catch((e) => console.error(e))
         })
 
@@ -159,10 +168,10 @@
 
         // send empty palette
         send_custom_palette(global_colors_accent_data)
-        .then((resp) => console.log(resp.json()))
+        .then((resp) => {
+            parent.wp.customize.previewer.refresh()
+        })
         .catch(() => console.log('Error: could not connect to WordPress.'))
-
-        parent.wp.customize.previewer.refresh();
 
     }
 
