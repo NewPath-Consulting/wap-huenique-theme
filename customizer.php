@@ -95,7 +95,7 @@ class Generatepress_Child_Customizer {
             'wap_customize_preview_js', 
             get_stylesheet_directory_uri() . '/js/customizer-preview.js', 
             array('customize-preview', 'jquery'), 
-            date("h:i:s"),
+            'ver' . date("h.i.s"),
             true
         );
         
@@ -104,7 +104,7 @@ class Generatepress_Child_Customizer {
             'color_thief',
             get_stylesheet_directory_uri() . '/js/color-thief.min.js',
             array(),
-            date("h:i:s"),
+            'ver' . date("h.i.s"),
             true
         );
     }
